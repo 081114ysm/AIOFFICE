@@ -11,4 +11,7 @@ export const officeApi = {
   ,getV2: () => request<V2State>("/api/v2")
   ,requestToolRun: (toolId: string, projectId: string) => request("/api/v2/tool-runs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ toolId, projectId }) })
   ,approveToolRun: (runId: string) => request(`/api/v2/tool-runs/${runId}/approve`, { method: "POST" })
+  ,getGithubUser: () => request("/api/github/user")
+  ,getGithubRepository: () => request("/api/github/repository")
+  ,getGithubContents: (path = "", ref = "") => request(`/api/github/contents?path=${encodeURIComponent(path)}&ref=${encodeURIComponent(ref)}`)
 };

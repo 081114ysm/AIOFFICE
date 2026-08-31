@@ -7,6 +7,10 @@
     "build": "node --check src/server.mjs",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
 }

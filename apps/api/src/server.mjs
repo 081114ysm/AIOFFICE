@@ -12,6 +12,7 @@ const server = createServer(async (req, res) => {
   try {
     const result = await route(req, res, url);
     if (result !== false) {
+      if (result?.redirect) { res.writeHead(302, { location: result.redirect }); res.end(); return; }
       if (result?.setCookie) res.setHeader("set-cookie", result.setCookie);
       return json(res, 200, result, config.webOrigin);
     }

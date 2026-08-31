@@ -3,6 +3,8 @@ import { config } from "./config/env.mjs";
 import { cors, json } from "./http/response.mjs";
 import { route } from "./app/router.mjs";
 import { migrate, pool } from "./infrastructure/database/postgres.mjs";
+import { WebSocketServer } from "ws";
+import { subscribeEvents } from "./infrastructure/events/event-bus.mjs";
 
 const server = createServer(async (req, res) => {
   if (req.method === "OPTIONS") return cors(res, config.webOrigin);
@@ -12,6 +14,16 @@ const server = createServer(async (req, res) => {
     if (result !== false) return json(res, 200, result, config.webOrigin);
     return json(res, 404, { message: "Not found" }, config.webOrigin);
   } catch (error) { return json(res, 400, { message: error instanceof Error ? error.message : "Bad request" }, config.webOrigin); }
+});
+const websocketServer = new WebSocketServer({ noServer: true });
+server.on("upgrade", (request, socket, head) => {
+  const origin = request.headers.origin;
+  if (origin && origin !== config.webOrigin) { socket.destroy(); return; }
+  if (request.url !== "/ws") { socket.destroy(); return; }
+  websocketServer.handleUpgrade(request, socket, head, (client) => {
+    subscribeEvents(client);
+    client.send(JSON.stringify({ type: "CONNECTED", occurredAt: new Date().toISOString() }));
+  });
 });
 
 async function start() {

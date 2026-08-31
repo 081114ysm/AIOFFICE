@@ -16,3 +16,12 @@ export const officeApi = {
   ,getGithubContents: (path = "", ref = "") => request(`/api/github/contents?path=${encodeURIComponent(path)}&ref=${encodeURIComponent(ref)}`)
   ,generateAiResponse: (prompt: string) => request<{ id: string; model: string; text: string }>("/api/ai/respond", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt }) })
 };
+
+export function connectOfficeEvents(onEvent: (event: { type: string; [key: string]: unknown }) => void) {
+  const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+  const socket = new WebSocket(`${base.replace(/^http/, "ws")}/ws`);
+  socket.addEventListener("message", (message) => {
+    try { onEvent(JSON.parse(message.data as string)); } catch { /* Ignore malformed events. */ }
+  });
+  return () => socket.close();
+}

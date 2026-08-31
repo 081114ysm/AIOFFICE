@@ -16,7 +16,7 @@ const server = createServer(async (req, res) => {
       return json(res, 200, result, config.webOrigin);
     }
     return json(res, 404, { message: "Not found" }, config.webOrigin);
-  } catch (error) { return json(res, 400, { message: error instanceof Error ? error.message : "Bad request" }, config.webOrigin); }
+  } catch (error) { return json(res, error?.statusCode ?? 400, { message: error instanceof Error ? error.message : "Bad request" }, config.webOrigin); }
 });
 const websocketServer = new WebSocketServer({ noServer: true });
 server.on("upgrade", (request, socket, head) => {

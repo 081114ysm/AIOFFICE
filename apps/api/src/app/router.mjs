@@ -10,19 +10,20 @@ import { v2Controller } from "../modules/v2/v2.controller.mjs";
 import { githubController } from "../modules/github/github.controller.mjs";
 import { aiController } from "../modules/ai/ai.controller.mjs";
 import { authController } from "../modules/auth/auth.controller.mjs";
+import { requireRole } from "../modules/auth/authorization.mjs";
 
 export async function route(req, res, url) {
-  if (url.pathname.startsWith("/api/v2")) return v2Controller(req, res, url);
-  if (url.pathname.startsWith("/api/github")) return githubController(req, res, url);
-  if (url.pathname.startsWith("/api/ai")) return aiController(req, res, url);
+  if (url.pathname.startsWith("/api/v2")) { await requireRole(req, ["CEO", "PM", "DEVELOPER"]); return v2Controller(req, res, url); }
+  if (url.pathname.startsWith("/api/github")) { await requireRole(req, ["CEO", "PM", "DEVELOPER", "QA"]); return githubController(req, res, url); }
+  if (url.pathname.startsWith("/api/ai")) { await requireRole(req, ["CEO", "PM", "DEVELOPER", "RESEARCH", "QA"]); return aiController(req, res, url); }
   if (url.pathname.startsWith("/api/auth")) return authController(req, res, url);
   if (req.method === "GET" && url.pathname === "/health") return healthController(req, res);
-  if (req.method === "GET" && url.pathname === "/api/state") return getState();
-  if (url.pathname === "/api/projects") return projectController(req, res);
-  const task = url.pathname.match(/^\/api\/tasks\/([^/]+)\/run$/); if (task) return taskController(req, res, task[1]);
-  const conversation = url.pathname.match(/^\/api\/conversations\/([^/]+)\/messages$/); if (conversation) return conversationController(req, res, conversation[1]);
-  if (url.pathname === "/api/meetings") return meetingController(req, res);
-  if (url.pathname === "/api/preferences/overlay") return preferencesController(req, res);
-  const approval = url.pathname.match(/^\/api\/approvals\/([^/]+)\/approve$/); if (approval) return approvalController(req, res, approval[1]);
+  if (req.method === "GET" && url.pathname === "/api/state") { await requireRole(req, ["CEO", "PM", "DEVELOPER", "RESEARCH", "QA"]); return getState(); }
+  if (url.pathname === "/api/projects") { await requireRole(req, ["CEO", "PM"]); return projectController(req, res); }
+  const task = url.pathname.match(/^\/api\/tasks\/([^/]+)\/run$/); if (task) { await requireRole(req, ["CEO", "PM", "DEVELOPER"]); return taskController(req, res, task[1]); }
+  const conversation = url.pathname.match(/^\/api\/conversations\/([^/]+)\/messages$/); if (conversation) { await requireRole(req, ["CEO", "PM", "DEVELOPER", "RESEARCH"]); return conversationController(req, res, conversation[1]); }
+  if (url.pathname === "/api/meetings") { await requireRole(req, ["CEO", "PM"]); return meetingController(req, res); }
+  if (url.pathname === "/api/preferences/overlay") { await requireRole(req, ["CEO"]); return preferencesController(req, res); }
+  const approval = url.pathname.match(/^\/api\/approvals\/([^/]+)\/approve$/); if (approval) { await requireRole(req, ["CEO"]); return approvalController(req, res, approval[1]); }
   return false;
 }

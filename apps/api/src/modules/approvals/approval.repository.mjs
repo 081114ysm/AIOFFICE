@@ -1,3 +1,2 @@
-import { memoryStore } from "../../infrastructure/database/memory.store.mjs";
-export const approvalRepository = { add: (approval) => memoryStore.approvals.push(approval) };
-
+import { pool } from "../../infrastructure/database/postgres.mjs";
+export const approvalRepository = { add: async (approval) => (await pool.query("insert into approvals (id, target_type, target_id, status, decided_at, created_at) values ($1, $2, $3, $4, now(), $5) returning id, target_type, target_id, status, decided_at, created_at", [approval.id, "PROJECT", approval.projectId, approval.status, approval.createdAt])).rows[0] };

@@ -109,8 +109,22 @@ create table if not exists tool_runs (
   completed_at timestamptz
 );
 
+create table if not exists preferences (
+  id boolean primary key default true check (id = true),
+  overlay_enabled boolean not null default false,
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists events (
+  id uuid primary key,
+  type text not null,
+  project_id uuid references projects(id) on delete cascade,
+  payload jsonb not null default '{}',
+  occurred_at timestamptz not null default now()
+);
+
 create index if not exists idx_tasks_project_status on tasks(project_id, status);
 create index if not exists idx_messages_conversation_sequence on messages(conversation_id, sequence);
 create index if not exists idx_agent_runs_task_created on agent_runs(task_id, started_at);
 create index if not exists idx_tool_runs_project_status on tool_runs(project_id, status);
-
+create index if not exists idx_events_project_occurred on events(project_id, occurred_at);

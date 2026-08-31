@@ -1,4 +1,4 @@
-import { getSnapshot } from "../infrastructure/database/store.snapshot.mjs";
+import { getState } from "../infrastructure/database/state.repository.mjs";
 import { healthController } from "../modules/health/health.controller.mjs";
 import { projectController } from "../modules/projects/project.controller.mjs";
 import { taskController } from "../modules/tasks/task.controller.mjs";
@@ -15,7 +15,7 @@ export async function route(req, res, url) {
   if (url.pathname.startsWith("/api/github")) return githubController(req, res, url);
   if (url.pathname.startsWith("/api/ai")) return aiController(req, res, url);
   if (req.method === "GET" && url.pathname === "/health") return healthController(req, res);
-  if (req.method === "GET" && url.pathname === "/api/state") return getSnapshot();
+  if (req.method === "GET" && url.pathname === "/api/state") return getState();
   if (url.pathname === "/api/projects") return projectController(req, res);
   const task = url.pathname.match(/^\/api\/tasks\/([^/]+)\/run$/); if (task) return taskController(req, res, task[1]);
   const conversation = url.pathname.match(/^\/api\/conversations\/([^/]+)\/messages$/); if (conversation) return conversationController(req, res, conversation[1]);

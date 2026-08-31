@@ -23,7 +23,7 @@ export async function githubCallback(code, state) {
   const user = (await pool.query("insert into users (id, github_id, login, display_name) values ($1, $2, $3, $4) on conflict (github_id) do update set login = excluded.login, display_name = excluded.display_name, updated_at = now() returning id, login, display_name, role", [randomUUID(), String(githubUser.id), githubUser.login, githubUser.name ?? githubUser.login])).rows[0];
   const sessionToken = randomBytes(32).toString("hex");
   await pool.query("insert into sessions (id, user_id, token_hash, expires_at) values ($1, $2, $3, now() + ($4 || ' days')::interval)", [randomUUID(), user.id, hash(sessionToken), config.authSessionDays]);
-  return { user, setCookie: `ai_office_session=${sessionToken}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${config.authSessionDays * 86400}` };
+  return { user, setCookie: `ai_office_session=${sessionToken}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${config.authSessionDays * 86400}`, redirect: `${config.webOrigin}/?auth=success` };
 }
 export async function currentUser(req) {
   const token = (req.headers.cookie ?? "").split(";").map((item) => item.trim()).find((item) => item.startsWith("ai_office_session="))?.split("=")[1];

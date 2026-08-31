@@ -8,10 +8,12 @@ import { approvalController } from "../modules/approvals/approval.controller.mjs
 import { preferencesController } from "../modules/preferences/preferences.controller.mjs";
 import { v2Controller } from "../modules/v2/v2.controller.mjs";
 import { githubController } from "../modules/github/github.controller.mjs";
+import { aiController } from "../modules/ai/ai.controller.mjs";
 
 export async function route(req, res, url) {
   if (url.pathname.startsWith("/api/v2")) return v2Controller(req, res, url);
   if (url.pathname.startsWith("/api/github")) return githubController(req, res, url);
+  if (url.pathname.startsWith("/api/ai")) return aiController(req, res, url);
   if (req.method === "GET" && url.pathname === "/health") return healthController(req, res);
   if (req.method === "GET" && url.pathname === "/api/state") return getSnapshot();
   if (url.pathname === "/api/projects") return projectController(req, res);

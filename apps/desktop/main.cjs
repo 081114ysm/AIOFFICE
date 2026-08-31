@@ -11,7 +11,10 @@ function createOverlay() {
   overlayWindow.on("closed", () => { overlayWindow = null; });
 }
 
-app.whenReady().then(() => { createOverlay(); globalShortcut.register("CommandOrControl+Shift+O", () => overlayWindow?.isVisible() ? overlayWindow.hide() : overlayWindow?.show()); });
+app.whenReady().then(() => {
+  if (process.env.AI_OFFICE_AUTO_START === "true" && process.platform === "darwin") app.setLoginItemSettings({ openAtLogin: true, args: ["--auto-start"] });
+  createOverlay();
+  globalShortcut.register("CommandOrControl+Shift+O", () => overlayWindow?.isVisible() ? overlayWindow.hide() : overlayWindow?.show());
+});
 app.on("will-quit", () => globalShortcut.unregisterAll());
 app.on("window-all-closed", (event) => event.preventDefault());
-

@@ -1,0 +1,16 @@
+.settings-panel { min-height: auto; margin-bottom: 14px; }
+.overlay-setting { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.overlay-setting p { margin: 5px 0 0; color: #8993b5; font-size: .85rem; }
+.switch { width: 48px; height: 28px; padding: 3px; border: 0; border-radius: 999px; background: #334155; cursor: pointer; }
+.switch span { display: block; width: 22px; height: 22px; border-radius: 50%; background: #f8fafc; transition: transform .2s; }
+.switch.on { background: #6366f1; } .switch.on span { transform: translateX(20px); }
+.agent-overlay { position: fixed; inset: 0; z-index: 8; pointer-events: none; overflow: hidden; }
+.overlay-agent { position: absolute; display: grid; justify-items: center; gap: 7px; animation: float 3s ease-in-out infinite; }
+.overlay-agent-pm { left: 10%; top: 25%; } .overlay-agent-research { left: 70%; top: 20%; animation-delay: -.8s; } .overlay-agent-dev { left: 35%; top: 68%; animation-delay: -1.5s; } .overlay-agent-qa { left: 78%; top: 70%; animation-delay: -2.1s; }
+.speech-bubble { min-width: 170px; padding: 10px 12px; border: 1px solid #5268ac; border-radius: 12px; background: #111a35ee; box-shadow: 0 8px 24px #0006; }
+.speech-bubble strong, .speech-bubble span { display: block; } .speech-bubble strong { color: #c7d2fe; font-size: .8rem; } .speech-bubble span { margin-top: 4px; color: #e2e8f0; font-size: .72rem; }
+.overlay-avatar { display: grid; place-items: center; width: 58px; height: 58px; border: 3px solid #fff8; border-radius: 18px; color: white; font-weight: 800; box-shadow: 0 7px 0 #0004; }
+.overlay-avatar.WORKING { animation: work 1s ease-in-out infinite; } .overlay-shadow { width: 44px; height: 8px; border-radius: 50%; background: #0005; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } } @keyframes work { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg) translateY(-4px); } }
+.overlay-page { position: relative; width: 100vw; min-height: 100vh; overflow: hidden; background: transparent; } .overlay-page .agent-overlay { position: absolute; } .overlay-loading { position: fixed; left: 50%; top: 10px; transform: translateX(-50%); color: #c7d2fe; font-size: .75rem; }
+.overlay-body { background: transparent !important; }

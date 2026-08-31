@@ -1,0 +1,7 @@
+{
+  "name": "@ai-office/desktop",
+  "private": true,
+  "scripts": { "dev": "electron ." },
+  "devDependencies": { "electron": "latest" }
+}
+

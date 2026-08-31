@@ -1,0 +1,15 @@
+import type { OfficeState } from "../../types/office";
+import { AgentGrid } from "../office/AgentGrid";
+import { ConversationPanel } from "../conversation/ConversationPanel";
+import { MetricCard } from "./MetricCard";
+import { TaskBoard } from "../tasks/TaskBoard";
+import { NotificationCenter } from "../notifications/NotificationCenter";
+import type { InAppNotification } from "../../store/office-store";
+import { AgentOverlay } from "../overlay/AgentOverlay";
+import { OverlaySettings } from "../settings/OverlaySettings";
+import { V2ControlPanel } from "../v2/V2ControlPanel";
+import type { V2State } from "../../types/office";
+import { WorkflowStrip } from "../workflow/WorkflowStrip";
+
+type Props = { data: OfficeState; v2: V2State | null; draft: string; notices: InAppNotification[]; overlayEnabled: boolean; onDraftChange: (value: string) => void; onSend: () => void; onRunTask: (id: string) => void; onCreateMeeting: () => void; onEnableNotifications: () => void; onDismissNotification: (id: string) => void; onOverlayChange: (enabled: boolean) => void; onRequestTool: (id: string) => void; onApproveTool: (id: string) => void };
+export function Dashboard({ data, v2, draft, notices, overlayEnabled, onDraftChange, onSend, onRunTask, onCreateMeeting, onEnableNotifications, onDismissNotification, onOverlayChange, onRequestTool, onApproveTool }: Props) { const active = data.projects[0]; return <main className="shell"><header><div><span className="eyebrow">AI OFFICE / V2</span><h1>{active?.name ?? "AI Office"}</h1><p className="muted">여러 AI 직원이 하나의 프로젝트를 실제 회사처럼 운영합니다.</p></div><div className="header-actions"><button className="secondary-button" onClick={onEnableNotifications}>알림 켜기</button><button className="secondary-button" onClick={onCreateMeeting}>+ 회의 시작</button><span className="status-pill">● {active?.status ?? "PLANNING"}</span></div></header><WorkflowStrip /><section className="panel settings-panel"><div className="panel-title"><h2>Settings</h2><span className="muted">화면 표시 설정</span></div><OverlaySettings enabled={overlayEnabled} onChange={onOverlayChange} /></section>{v2 && <V2ControlPanel state={v2} onRequest={onRequestTool} onApprove={onApproveTool} />}<section className="metrics"><MetricCard label="진행 중 Task" value={String(data.tasks.filter((t) => t.status === "IN_PROGRESS").length)} /><MetricCard label="Agent" value={`${data.agents.filter((a) => a.status !== "IDLE").length}/${data.agents.length}`} /><MetricCard label="회의" value={String(data.meetings.length)} /><MetricCard label="메시지" value={String(data.messages.length)} /></section><div className="grid"><section className="panel office"><div className="panel-title"><h2>Pixel Office</h2><span className="muted">실시간 상태</span></div><AgentGrid agents={data.agents} /></section><TaskBoard tasks={data.tasks} onRun={onRunTask} /><ConversationPanel messages={data.messages} draft={draft} onDraftChange={onDraftChange} onSend={onSend} /></div>{overlayEnabled && <AgentOverlay agents={data.agents} />}<NotificationCenter notices={notices} onDismiss={onDismissNotification} /></main>; }

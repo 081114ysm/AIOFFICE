@@ -1,0 +1,4 @@
+import type { V2State } from "../../types/office";
+
+export function V2ControlPanel({ state, onRequest, onApprove }: { state: V2State; onRequest: (toolId: string) => void; onApprove: (runId: string) => void }) { return <section className="panel v2-panel"><div className="panel-title"><h2>V2 Tool Center</h2><span className="muted">승인 기반 Mock Adapter</span></div><div className="v2-tools">{state.tools.map((tool) => <div className="v2-tool" key={tool.id}><div><strong>{tool.name}</strong><p>{tool.description}</p></div><button disabled={!tool.enabled} onClick={() => onRequest(tool.id)}>{tool.enabled ? "실행 요청" : "비활성"}</button></div>)}</div>{state.toolRuns.filter((run) => run.status === "PENDING_APPROVAL").map((run) => <div className="approval-row" key={run.id}><span>Tool 실행 승인 대기</span><button onClick={() => onApprove(run.id)}>승인</button></div>)}</section>; }
+

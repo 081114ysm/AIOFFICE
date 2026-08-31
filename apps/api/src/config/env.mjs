@@ -9,4 +9,8 @@ export const config = {
   openaiModel: process.env.AI_MODEL || "gpt-5",
   openaiPerMinuteLimit: Number(process.env.AI_PER_MINUTE_LIMIT ?? 20),
   openaiDailyLimit: Number(process.env.AI_DAILY_LIMIT ?? 100),
+  githubClientId: process.env.GITHUB_CLIENT_ID ?? "",
+  githubClientSecret: process.env.GITHUB_CLIENT_SECRET ?? "",
+  authCallbackUrl: process.env.AUTH_CALLBACK_URL ?? "http://localhost:4000/api/auth/callback/github",
+  authSessionDays: Number(process.env.AUTH_SESSION_DAYS ?? 7),
 };

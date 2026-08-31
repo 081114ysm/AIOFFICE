@@ -123,8 +123,27 @@ create table if not exists events (
   occurred_at timestamptz not null default now()
 );
 
+create table if not exists users (
+  id uuid primary key,
+  github_id text unique not null,
+  login text not null,
+  display_name text not null default '',
+  role text not null default 'CEO',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists sessions (
+  id uuid primary key,
+  user_id uuid not null references users(id) on delete cascade,
+  token_hash text unique not null,
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+
 create index if not exists idx_tasks_project_status on tasks(project_id, status);
 create index if not exists idx_messages_conversation_sequence on messages(conversation_id, sequence);
 create index if not exists idx_agent_runs_task_created on agent_runs(task_id, started_at);
 create index if not exists idx_tool_runs_project_status on tool_runs(project_id, status);
 create index if not exists idx_events_project_occurred on events(project_id, occurred_at);
+create index if not exists idx_sessions_token_hash on sessions(token_hash);

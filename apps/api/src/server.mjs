@@ -11,7 +11,10 @@ const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
   try {
     const result = await route(req, res, url);
-    if (result !== false) return json(res, 200, result, config.webOrigin);
+    if (result !== false) {
+      if (result?.setCookie) res.setHeader("set-cookie", result.setCookie);
+      return json(res, 200, result, config.webOrigin);
+    }
     return json(res, 404, { message: "Not found" }, config.webOrigin);
   } catch (error) { return json(res, 400, { message: error instanceof Error ? error.message : "Bad request" }, config.webOrigin); }
 });

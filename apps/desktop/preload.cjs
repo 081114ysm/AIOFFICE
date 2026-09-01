@@ -1,0 +1,2 @@
+const { contextBridge, ipcRenderer } = require("electron");
+contextBridge.exposeInMainWorld("aiOfficeDesktop", { startReadOnlyCodex: (request) => ipcRenderer.invoke("agent:start-readonly", request), stopAgent: (id) => ipcRenderer.invoke("agent:stop", id), onAgentEvent: (callback) => { const listener = (_event, payload) => callback(payload); ipcRenderer.on("agent:event", listener); return () => ipcRenderer.removeListener("agent:event", listener); } });

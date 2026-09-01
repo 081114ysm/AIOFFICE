@@ -13,12 +13,29 @@
   "build": {
     "appId": "com.aioffice.desktop",
     "productName": "AI Office",
-    "files": ["main.cjs", "README.md"],
-    "mac": { "target": ["dmg", "zip"] },
-    "dmg": { "title": "AI Office" }
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "agent-runner.cjs",
+      "README.md"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "dmg": {
+      "title": "AI Office"
+    }
   },
   "devDependencies": {
     "electron": "latest",
     "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "node-pty": "^1.1.0",
+    "pixi.js": "^8.20.1",
+    "xterm": "^5.3.0"
   }
 }

@@ -1,6 +1,5 @@
 import { createId, now } from "../../common/id.mjs";
 import { publish } from "../../infrastructure/events/event-bus.mjs";
-import { getSnapshot } from "../../infrastructure/database/store.snapshot.mjs";
 import { conversationRepository } from "./conversation.repository.mjs";
 export async function addMessage(conversationId, input) {
   const conversation = await conversationRepository.findById(conversationId);

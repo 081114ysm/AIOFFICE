@@ -13,4 +13,6 @@ export const config = {
   githubClientSecret: process.env.GITHUB_CLIENT_SECRET ?? "",
   authCallbackUrl: process.env.AUTH_CALLBACK_URL ?? "http://localhost:4000/api/auth/callback/github",
   authSessionDays: Number(process.env.AUTH_SESSION_DAYS ?? 7),
+  workspaceRoot: process.env.WORKSPACE_ROOT || process.cwd(),
+  toolTimeoutMs: Number(process.env.TOOL_TIMEOUT_MS ?? 30_000),
 };

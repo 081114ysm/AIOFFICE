@@ -37,7 +37,20 @@ function executeCommand(parts) {
   });
 }
 
+function executeCodexInspection(prompt) {
+  return new Promise((resolve, reject) => {
+    const child = spawn("codex", ["exec", "--json", "--sandbox", "read-only", "--ephemeral", "-C", config.workspaceRoot, String(prompt ?? "")], { cwd: config.workspaceRoot, shell: false, env: { PATH: "/usr/bin:/bin:/usr/sbin:/sbin:/Users/081114ysm/.local/bin", CODEX_HOME: "/Users/081114ysm/.codex" } });
+    let stdout = ""; let stderr = ""; let settled = false;
+    const finish = (fn, value) => { if (settled) return; settled = true; fn(value); };
+    const timer = setTimeout(() => { child.kill("SIGTERM"); finish(reject, Object.assign(new Error("Codex 분석 시간이 초과되었습니다."), { statusCode: 408 })); }, config.toolTimeoutMs);
+    child.stdout.on("data", (chunk) => { stdout += chunk.toString(); }); child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+    child.on("error", (error) => { clearTimeout(timer); finish(reject, error); });
+    child.on("close", (code) => { clearTimeout(timer); finish(resolve, { code, stdout: stdout.slice(-30_000), stderr: stderr.slice(-10_000), mode: "read-only" }); });
+  });
+}
+
 export async function executeTool(toolId, input = {}) {
+  if (toolId === "codex.inspect") return executeCodexInspection(input.prompt);
   if (toolId === "github.read") return input.path ? githubClient.getContents(input.path, input.ref) : githubClient.getRepository();
   if (toolId === "filesystem.read") return { path: input.path, content: await fs.readFile(safePath(input.path), "utf8") };
   if (toolId === "filesystem.write") { const target = safePath(input.path); await fs.mkdir(path.dirname(target), { recursive: true }); await fs.writeFile(target, String(input.content ?? ""), "utf8"); return { path: input.path, bytes: Buffer.byteLength(String(input.content ?? "")) }; }

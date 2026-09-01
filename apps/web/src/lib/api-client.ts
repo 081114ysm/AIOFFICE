@@ -11,7 +11,7 @@ export const officeApi = {
   ,resumeConversation: (conversationId: string) => request(`/api/conversations/${conversationId}/resume`, { method: "POST" })
   ,updateOverlayPreference: (overlayEnabled: boolean) => request("/api/preferences/overlay", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ overlayEnabled }) })
   ,getV2: () => request<V2State>("/api/v2")
-  ,requestToolRun: (toolId: string, projectId: string) => request("/api/v2/tool-runs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ toolId, projectId }) })
+  ,requestToolRun: (toolId: string, projectId: string, input: Record<string, unknown> = {}) => request("/api/v2/tool-runs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ toolId, projectId, input }) })
   ,approveToolRun: (runId: string) => request(`/api/v2/tool-runs/${runId}/approve`, { method: "POST" })
   ,getGithubUser: () => request("/api/github/user")
   ,getGithubRepository: () => request("/api/github/repository")

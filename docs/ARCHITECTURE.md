@@ -27,7 +27,7 @@ Next.js Dashboard / Electron Overlay
 
 ```text
 apps/api/src/{app,config,common,http,infrastructure,modules}
-apps/api/src/modules/{auth,projects,tasks,conversations,meetings,approvals,ai,github,v2}
+apps/api/src/modules/{auth,projects,tasks,conversations,meetings,approvals,qa,ai,github,v2}
 apps/web/src/{app,components,lib,store,types}
 apps/web/src/components/{dashboard,office,activity,tasks,conversation,settings,overlay}
 apps/desktop/{main.cjs,package.json}

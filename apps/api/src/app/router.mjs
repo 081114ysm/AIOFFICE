@@ -10,6 +10,7 @@ import { v2Controller } from "../modules/v2/v2.controller.mjs";
 import { githubController } from "../modules/github/github.controller.mjs";
 import { aiController } from "../modules/ai/ai.controller.mjs";
 import { authController } from "../modules/auth/auth.controller.mjs";
+import { qaController } from "../modules/qa/qa.controller.mjs";
 import { requireRole } from "../modules/auth/authorization.mjs";
 
 export async function route(req, res, url) {
@@ -21,9 +22,10 @@ export async function route(req, res, url) {
   if (req.method === "GET" && url.pathname === "/api/state") { await requireRole(req, ["CEO", "PM", "DEVELOPER", "RESEARCH", "QA"]); return getState(); }
   if (url.pathname === "/api/projects") { await requireRole(req, ["CEO", "PM"]); return projectController(req, res); }
   const task = url.pathname.match(/^\/api\/tasks\/([^/]+)\/run$/); if (task) { await requireRole(req, ["CEO", "PM", "DEVELOPER"]); return taskController(req, res, task[1]); }
+  const qa = url.pathname.match(/^\/api\/tasks\/([^/]+)\/qa$/); if (qa) { await requireRole(req, ["CEO", "QA"]); return qaController(req, res, qa[1]); }
   const resume = url.pathname.match(/^\/api\/conversations\/([^/]+)\/resume$/); if (resume) { await requireRole(req, ["CEO", "PM"]); return conversationController(req, res, resume[1]); }
   const conversation = url.pathname.match(/^\/api\/conversations\/([^/]+)(?:\/messages)?$/); if (conversation) { await requireRole(req, ["CEO", "PM", "DEVELOPER", "RESEARCH"]); return conversationController(req, res, conversation[1]); }
-  if (url.pathname === "/api/meetings") { await requireRole(req, ["CEO", "PM"]); return meetingController(req, res); }
+  const meeting = url.pathname.match(/^\/api\/meetings(?:\/([^/]+)\/complete)?$/); if (meeting) { await requireRole(req, ["CEO", "PM"]); return meetingController(req, res, meeting[1]); }
   if (url.pathname === "/api/preferences/overlay") { await requireRole(req, ["CEO"]); return preferencesController(req, res); }
   const approval = url.pathname.match(/^\/api\/approvals\/([^/]+)\/approve$/); if (approval) { await requireRole(req, ["CEO"]); return approvalController(req, res, approval[1]); }
   return false;

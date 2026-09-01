@@ -88,6 +88,17 @@ create table if not exists meeting_participants (
   primary key (meeting_id, agent_id)
 );
 
+create table if not exists meeting_messages (
+  id uuid primary key,
+  meeting_id uuid not null references meetings(id) on delete cascade,
+  agent_id uuid references agents(id),
+  role text not null,
+  content text not null,
+  sequence integer not null,
+  created_at timestamptz not null default now(),
+  unique (meeting_id, sequence)
+);
+
 create table if not exists approvals (
   id uuid primary key,
   target_type text not null,
@@ -193,3 +204,4 @@ create index if not exists idx_events_project_occurred on events(project_id, occ
 create index if not exists idx_sessions_token_hash on sessions(token_hash);
 create index if not exists idx_memories_project_type on memories(project_id, type);
 create index if not exists idx_decisions_project_created on decisions(project_id, created_at);
+create index if not exists idx_meeting_messages_meeting_sequence on meeting_messages(meeting_id, sequence);

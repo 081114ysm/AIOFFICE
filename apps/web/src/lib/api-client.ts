@@ -6,6 +6,7 @@ export const officeApi = {
   getState: () => request<OfficeState>("/api/state"),
   sendMessage: (conversationId: string, content: string) => request(`/api/conversations/${conversationId}/messages`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ content }) }),
   runTask: (taskId: string) => request(`/api/tasks/${taskId}/run`, { method: "POST" }),
+  reviewTask: (taskId: string, result: "PASS" | "FAIL", evidence: string) => request(`/api/tasks/${taskId}/qa`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ result, evidence }) }),
   createMeeting: (projectId: string) => request("/api/meetings", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ projectId, title: "Agent 협업 회의" }) })
   ,resumeConversation: (conversationId: string) => request(`/api/conversations/${conversationId}/resume`, { method: "POST" })
   ,updateOverlayPreference: (overlayEnabled: boolean) => request("/api/preferences/overlay", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ overlayEnabled }) })

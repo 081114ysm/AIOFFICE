@@ -2,55 +2,41 @@
 
 ## 역할
 
-Conversation은 CEO가 프로젝트에 요청을 입력하고, Agent 작업과 결과를 확인하는 장기 작업 단위다. Message는 대화 표시용이고, Task·Meeting·Decision은 별도 엔티티로 저장해 검색과 상태 관리를 가능하게 한다.
+Conversation은 CEO 요청과 Agent 업무 진행을 연결하는 장기 작업 단위다. Message는 표시용 로그이고 Task·Meeting·Decision·Memory는 별도 Entity로 저장한다.
 
 ## 구조
 
 ```text
 Conversation
- ├─ Message (CEO / Agent / System)
+ ├─ Message(role, content, sequence, metadata)
  ├─ linked Project
  ├─ linked Task references
  ├─ linked Meeting references
  └─ Summary / Context snapshot
 ```
 
-## 메시지 규칙
-
-Message는 `role`, `content`, `sequence`, `metadata`, `created_at`을 가진다. AI 원문과 화면 표시용 텍스트를 구분하고, 서버가 sequence를 발급한다. 클라이언트 시간을 기준으로 정렬하면 기기 시계가 틀릴 때 순서가 깨진다.
-
-## CEO 요청 흐름
+## CEO 요청 처리
 
 ```text
-CEO message 저장
-→ PM Run 생성
-→ PM 결과(Task plan) 검증·저장
-→ system message로 계획 표시
-→ Agent Run 진행 메시지 연결
+CEO Message 저장 → PM Agent Run 생성 → PM 계획 JSON 검증
+→ Task/dependency 저장 → System Message 계획 표시
+→ Agent Run 진행·결과 Message 연결
 ```
 
-## Context 복원과 Resume
+서버가 Conversation별 `sequence`를 발급한다. 클라이언트 시간으로 정렬하지 않는다. AI 원문과 화면용 요약을 구분한다.
 
-Conversation을 다시 열 때 `project summary`, 마지막 상태, 미완료 Task, 최근 메시지, 관련 Decision, Memory를 읽는다. PAUSED 상태에서 Resume하면 새 Conversation을 만들지 않고 기존 작업에 Resume Event를 추가한다. 이전 Context snapshot을 그대로 재사용하지 말고 현재 DB 상태와 합쳐야 한다.
+## Resume
 
-## Summary 정책
+`POST /api/conversations/:id/resume`은 새 Conversation을 만들지 않는다. 현재 DB의 Project summary, 마지막 상태, 미완료 Task, 최근 메시지, Decision, Memory를 다시 읽고 `CONVERSATION_RESUMED` Event와 System Message를 추가한다.
 
-긴 대화는 일정 메시지 수 또는 작업 완료 시 요약한다. Summary에는 현재 목표, 완료 사항, 미결정 사항, 다음 단계, 핵심 Decision, 관련 Task ID를 넣는다. 요약 실패가 원본 메시지를 삭제하는 근거가 되면 안 된다.
+## Summary
 
-## V1 API 초안
+메시지 임계치 초과 또는 작업 완료 시 summary를 만든다. 필수 항목은 현재 목표, 완료 사항, 미결정 사항, 다음 단계, 핵심 Decision, 관련 Task ID다. 요약 실패가 원본 Message 삭제 사유가 되면 안 된다.
 
-```text
-POST /projects/:projectId/conversations
-GET  /conversations/:conversationId
-POST /conversations/:conversationId/messages
-POST /conversations/:conversationId/resume
-GET  /conversations/:conversationId/events
-```
+## 실시간과 알림
 
-## 표시 원칙
+Conversation과 Pixel Office는 같은 Event stream을 구독한다. `AGENT_RUN_COMPLETED` 수신 시 Zustand Toast를 추가하고 Notification API 권한이 있으면 시스템 알림을 보낸다. 종료 상태 Web Push는 V2에서 VAPID와 Service Worker로 추가한다.
 
-Conversation 화면과 Pixel Office 화면은 같은 Event stream을 구독한다. 한쪽만 로컬 상태로 갱신하면 새로고침·다중 탭에서 서로 다른 회사가 된다.
+## 오류
 
-## 작업 완료 알림
-
-프론트는 `AGENT_RUN_COMPLETED` Event를 감지하면 Zustand 알림 목록에 Toast를 추가하고, 브라우저 `Notification API` 권한이 허용된 경우 시스템 알림도 띄운다. 브라우저가 완전히 종료된 상태에서 알림을 보내는 Web Push는 V2에서 VAPID 구독과 Service Worker를 추가해야 한다.
+로그인 없음은 401, 역할 부족은 403, 없는 Conversation은 404, 잘못된 상태 전이는 409다. 실패를 빈 배열로 숨기지 않는다.

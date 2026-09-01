@@ -7,6 +7,7 @@ export const officeApi = {
   sendMessage: (conversationId: string, content: string) => request(`/api/conversations/${conversationId}/messages`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ content }) }),
   runTask: (taskId: string) => request(`/api/tasks/${taskId}/run`, { method: "POST" }),
   createMeeting: (projectId: string) => request("/api/meetings", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ projectId, title: "Agent 협업 회의" }) })
+  ,resumeConversation: (conversationId: string) => request(`/api/conversations/${conversationId}/resume`, { method: "POST" })
   ,updateOverlayPreference: (overlayEnabled: boolean) => request("/api/preferences/overlay", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ overlayEnabled }) })
   ,getV2: () => request<V2State>("/api/v2")
   ,requestToolRun: (toolId: string, projectId: string) => request("/api/v2/tool-runs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ toolId, projectId }) })

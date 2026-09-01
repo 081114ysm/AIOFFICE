@@ -141,9 +141,55 @@ create table if not exists sessions (
   created_at timestamptz not null default now()
 );
 
+create table if not exists decisions (
+  id uuid primary key,
+  project_id uuid not null references projects(id) on delete cascade,
+  meeting_id uuid references meetings(id) on delete set null,
+  question text not null,
+  options jsonb not null default '[]',
+  chosen_option text,
+  rationale text not null default '',
+  decided_by uuid references agents(id),
+  confidence numeric,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists action_items (
+  id uuid primary key,
+  project_id uuid not null references projects(id) on delete cascade,
+  meeting_id uuid references meetings(id) on delete set null,
+  task_id uuid references tasks(id) on delete set null,
+  assignee_agent_id uuid references agents(id),
+  title text not null,
+  due_at timestamptz,
+  status text not null default 'OPEN',
+  created_at timestamptz not null default now()
+);
+
+create table if not exists qa_reviews (
+  id uuid primary key,
+  project_id uuid not null references projects(id) on delete cascade,
+  task_id uuid references tasks(id) on delete cascade,
+  reviewer_agent_id uuid references agents(id),
+  result text not null check (result in ('PASS', 'FAIL')),
+  evidence text not null default '',
+  created_at timestamptz not null default now()
+);
+
+create table if not exists memories (
+  id uuid primary key,
+  project_id uuid not null references projects(id) on delete cascade,
+  type text not null,
+  summary text not null,
+  content jsonb not null default '{}',
+  created_at timestamptz not null default now()
+);
+
 create index if not exists idx_tasks_project_status on tasks(project_id, status);
 create index if not exists idx_messages_conversation_sequence on messages(conversation_id, sequence);
 create index if not exists idx_agent_runs_task_created on agent_runs(task_id, started_at);
 create index if not exists idx_tool_runs_project_status on tool_runs(project_id, status);
 create index if not exists idx_events_project_occurred on events(project_id, occurred_at);
 create index if not exists idx_sessions_token_hash on sessions(token_hash);
+create index if not exists idx_memories_project_type on memories(project_id, type);
+create index if not exists idx_decisions_project_created on decisions(project_id, created_at);

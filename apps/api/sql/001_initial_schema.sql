@@ -11,10 +11,23 @@ create table if not exists agents (
   id uuid primary key,
   name text not null,
   role text not null,
+  department text not null default '비서실',
   status text not null default 'IDLE',
   color text not null,
+  position_x integer not null default 8,
+  position_y integer not null default 8,
+  room_id text not null default 'lobby',
+  speech text not null default '업무 대기 중',
+  is_manager boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+alter table agents add column if not exists department text not null default '비서실';
+alter table agents add column if not exists position_x integer not null default 8;
+alter table agents add column if not exists position_y integer not null default 8;
+alter table agents add column if not exists room_id text not null default 'lobby';
+alter table agents add column if not exists speech text not null default '업무 대기 중';
+alter table agents add column if not exists is_manager boolean not null default false;
 
 create table if not exists project_agents (
   project_id uuid not null references projects(id) on delete cascade,

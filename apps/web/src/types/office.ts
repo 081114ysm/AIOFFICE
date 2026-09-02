@@ -1,4 +1,4 @@
-export type Agent = { id: string; name: string; role: string; status: string; color: string };
+export type Agent = { id: string; name: string; role: string; department?: string; status: string; color: string; positionX?: number; positionY?: number; roomId?: string; speech?: string; isManager?: boolean };
 export type Task = { id: string; title: string; status: string; assigneeAgentId: string };
 export type Message = { id?: string; role: string; content: string; createdAt: string };
 export type OfficeEvent = { id: string; type: string; projectId: string; payload: { taskId?: string; agentId?: string }; occurredAt: string };

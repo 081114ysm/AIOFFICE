@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, ipcMain } = require("electron");
+const { app, BrowserWindow, Notification, globalShortcut, ipcMain } = require("electron");
 const path = require("node:path");
 const { ReadOnlyAgentRunner } = require("./agent-runner.cjs");
 
@@ -19,6 +19,7 @@ app.whenReady().then(() => {
   agentRunner = new ReadOnlyAgentRunner({ workspaceRoot: process.env.WORKSPACE_ROOT || path.resolve(__dirname, "../.."), onEvent: (event) => overlayWindow?.webContents.send("agent:event", event) });
   ipcMain.handle("agent:start-readonly", (_event, request) => agentRunner.start(request));
   ipcMain.handle("agent:stop", (_event, id) => agentRunner.stop(id));
+  ipcMain.on("notification:completion", (_event, payload) => { if (Notification.isSupported()) new Notification({ title: String(payload?.title || "AI Office"), body: String(payload?.body || "작업이 완료되었습니다.") }).show(); });
   createOverlay();
   globalShortcut.register("CommandOrControl+Shift+O", () => overlayWindow?.isVisible() ? overlayWindow.hide() : overlayWindow?.show());
 });

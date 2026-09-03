@@ -13,6 +13,7 @@ declare global {
     aiOfficeDesktop?: {
       startReadOnlyCodex: (request: { id: string; name?: string; prompt: string }) => Promise<{ id: string; status: string }>;
       stopAgent: (id: string) => Promise<boolean>;
+      notifyCompletion?: (title: string, body: string) => void;
       onAgentEvent: (callback: (event: DesktopAgentEvent) => void) => () => void;
     };
   }

@@ -102,14 +102,14 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 @media (max-width: 720px) { .game-shell header { align-items: flex-start; } .game-shell header .header-actions { flex-wrap: wrap; justify-content: flex-end; } .game-shell .status-pill { display: none; } }
 
 /* One-page workspace: office on the left, CEO chat on the right. */
-.game-shell .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 14px; padding: 138px 20px 20px; min-height: 100vh; }
+.game-shell .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 14px; padding: 138px 20px 20px; min-height: 100vh; }
 .game-shell .office-map-panel { grid-column: 1; height: calc(100vh - 158px); }
 .game-shell .side-column { position: static; grid-column: 2; display: flex; flex-direction: column; width: auto; max-height: calc(100vh - 158px); overflow: auto; gap: 10px; }
 .game-shell .side-column > * { flex: 0 0 auto; }
 .game-shell .side-column .conversation { position: static; width: auto; max-height: none; padding: 14px; }
-.game-shell .side-column .conversation .messages { max-height: 360px; margin-bottom: 12px; }
+.game-shell .side-column .conversation .messages { max-height: 430px; margin-bottom: 12px; }
 .game-shell .side-column .conversation form { display: flex; }
-.game-shell .side-column .conversation form input { min-width: 0; width: 100%; padding: 10px; }
+.game-shell .side-column .conversation form input { min-width: 0; width: 100%; padding: 12px; }
 .game-shell .side-column .conversation form button { padding: 10px 12px; }
 .game-shell .side-column .live-activity, .game-shell .side-column .task-board { padding: 12px; }
 .game-shell .metrics { display: none; }
@@ -120,6 +120,7 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
   .game-shell .side-column { max-height: none; margin-top: 10px; }
   .game-shell .metrics { right: 20px; }
 }
+@media (min-width: 901px) and (max-width: 1250px) { .game-shell .dashboard-grid { grid-template-columns: minmax(0, 1fr) 390px; } }
 
 /* Warm pixel-office palette: paper, ink, mint and amber. */
 .game-shell { overflow-x: hidden; overflow-y: auto; background: #d8c9a9; background-image: linear-gradient(rgba(91, 74, 55, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(91, 74, 55, .06) 1px, transparent 1px); background-size: 16px 16px; }

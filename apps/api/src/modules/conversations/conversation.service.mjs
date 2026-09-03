@@ -4,6 +4,7 @@ import { conversationRepository } from "./conversation.repository.mjs";
 import { pool } from "../../infrastructure/database/postgres.mjs";
 import { generateAgentResponse } from "../ai/openai.client.mjs";
 import { rememberAgent } from "../agents/agent-collaboration.service.mjs";
+import { buildCompanyPrompt } from "../ai/company-policy.mjs";
 export async function addMessage(conversationId, input) {
   const conversation = await conversationRepository.findById(conversationId);
   if (!conversation) throw Object.assign(new Error("Conversation not found"), { statusCode: 404 });
@@ -20,7 +21,7 @@ export async function addMessage(conversationId, input) {
     await pool.query("update agents set status = 'WORKING', speech = '대표님 지시를 분석하고 있어요' where id = $1", [task.assigneeAgentId]);
     publish("AGENT_SPEECH_STARTED", conversation.project_id, { agentId: task.assigneeAgentId, taskId: task.id });
     try {
-      const response = await generateAgentResponse(`대표님의 지시: ${message.content}\n담당 부서: 비서실/PM\n업무 상태: 요청 접수 완료\n\n대표님께 현재 접수 결과와 다음 단계를 3문장 이내로 보고해줘. 파일 수정, 터미널, GitHub 작업이 필요하면 반드시 승인 대기라고 명시해줘.`);
+      const response = await generateAgentResponse(buildCompanyPrompt(message.content));
       await conversationRepository.addMessage({ id: createId(), conversationId, role: "PM", content: response.text, createdAt: now() }, sequence);
       await rememberAgent({ projectId: conversation.project_id, agentId: task.assigneeAgentId, type: "CONVERSATION", summary: message.content.slice(0, 500), content: { response: response.text, taskId: task.id, model: response.model } });
       await pool.query("update agents set status = 'IDLE', speech = $2 where id = $1", [task.assigneeAgentId, response.text.slice(0, 300)]);

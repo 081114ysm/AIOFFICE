@@ -164,6 +164,9 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 .game-shell .notification-center .toast strong { color: #493d33; }
 .game-shell .notification-center .toast p { color: #6d5b49; }
 .game-shell .notification-center .toast button { color: #6d5b49; }
+.connection-state { min-height: 100vh; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; color: #493d33; background: #fffaf0; }
+.connection-state p { margin: 0; font-weight: 700; }
+.connection-state .primary-button { text-decoration: none; }
 @media (max-width: 900px) {
   .game-shell .workflow-strip { top: 112px; }
   .game-shell .dashboard-grid { padding-top: 174px; }

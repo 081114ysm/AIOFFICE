@@ -14,6 +14,7 @@ declare global {
       startReadOnlyCodex: (request: { id: string; name?: string; prompt: string }) => Promise<{ id: string; status: string }>;
       stopAgent: (id: string) => Promise<boolean>;
       notifyCompletion?: (title: string, body: string) => void;
+      selectWorkspace?: () => Promise<string | null>;
       onAgentEvent: (callback: (event: DesktopAgentEvent) => void) => () => void;
     };
   }

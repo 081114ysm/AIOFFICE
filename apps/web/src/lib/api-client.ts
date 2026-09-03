@@ -17,6 +17,7 @@ export const officeApi = {
   ,getGithubRepository: () => request("/api/github/repository")
   ,getGithubContents: (path = "", ref = "") => request(`/api/github/contents?path=${encodeURIComponent(path)}&ref=${encodeURIComponent(ref)}`)
   ,generateAiResponse: (prompt: string) => request<{ id: string; model: string; text: string }>("/api/ai/respond", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt }) })
+  ,selectWorkspace: (root: string) => request<{ root: string }>("/api/workspace/select", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ root }) })
 };
 
 export function connectOfficeEvents(onEvent: (event: { type: string; [key: string]: unknown }) => void) {

@@ -27,10 +27,10 @@ function LoginGate({ message }: { message: string }) {
 }
 
 export default function HomePage() {
-  const { data, isLoading, error, messageDraft, notifications, overlayEnabled, setMessageDraft, setOverlayEnabled, fetchState, connectLive, sendMessage, runTask, createMeeting, enableNotifications, dismissNotification } = useOfficeStore();
+  const { data, isLoading, error, messageDraft, notifications, overlayEnabled, workspaceRoot, setMessageDraft, setOverlayEnabled, selectWorkspace, fetchState, connectLive, sendMessage, runTask, createMeeting, enableNotifications, dismissNotification } = useOfficeStore();
   useEffect(() => { void fetchState(); const disconnect = connectLive(); const timer = setInterval(() => { void fetchState(); }, 10000); return () => { disconnect(); clearInterval(timer); }; }, [fetchState, connectLive]);
   if (isLoading && !data) return <main><p>AI Office 연결 중...</p></main>;
   if (error && !data) return <LoginGate message={error} />;
   if (!data) return <LoginGate message="로그인이 필요합니다." />;
-  return <Dashboard data={data} draft={messageDraft} notices={notifications} overlayEnabled={overlayEnabled} onDraftChange={setMessageDraft} onSend={() => void sendMessage()} onRunTask={(id) => void runTask(id)} onCreateMeeting={() => void createMeeting()} onEnableNotifications={() => void enableNotifications()} onDismissNotification={dismissNotification} onOverlayChange={setOverlayEnabled} />;
+  return <Dashboard data={data} draft={messageDraft} notices={notifications} overlayEnabled={overlayEnabled} workspaceRoot={workspaceRoot} onDraftChange={setMessageDraft} onSend={() => void sendMessage()} onRunTask={(id) => void runTask(id)} onCreateMeeting={() => void createMeeting()} onEnableNotifications={() => void enableNotifications()} onDismissNotification={dismissNotification} onOverlayChange={setOverlayEnabled} onSelectWorkspace={() => void selectWorkspace()} />;
 }

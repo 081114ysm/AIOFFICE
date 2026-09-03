@@ -18,11 +18,12 @@ export function PixelOfficeMap({ agents }: { agents: Agent[] }) {
   const hostRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const host = hostRef.current; if (!host) return;
-    let disposed = false; let animation = 0;
+    let disposed = false; let initialized = false; let animation = 0;
     const app = new PIXI.Application();
     void (async () => {
       await app.init({ resizeTo: host, background: "#dcecfb", antialias: false, preference: "webgl" });
-      if (disposed) { app.destroy(true); return; }
+      initialized = true;
+      if (disposed) { app.destroy({ removeView: true }, { children: true }); return; }
       host.appendChild(app.canvas); app.canvas.setAttribute("aria-label", "실시간 AI Office Pixi 맵");
       const world = new PIXI.Container(); app.stage.addChild(world);
       const redraw = () => {
@@ -37,7 +38,7 @@ export function PixelOfficeMap({ agents }: { agents: Agent[] }) {
       };
       const tick = () => { if (disposed) return; redraw(); animation = window.setTimeout(tick, 350); }; tick();
     })();
-    return () => { disposed = true; window.clearTimeout(animation); app.destroy(true); };
+    return () => { disposed = true; window.clearTimeout(animation); if (initialized) app.destroy({ removeView: true }, { children: true }); };
   }, [agents]);
   return <div ref={hostRef} className="pixi-office-canvas" aria-label="AI 직원 실시간 픽셀 오피스" />;
 }

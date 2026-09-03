@@ -122,7 +122,7 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 }
 
 /* Warm pixel-office palette: paper, ink, mint and amber. */
-.game-shell { background: #d8c9a9; background-image: linear-gradient(rgba(91, 74, 55, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(91, 74, 55, .06) 1px, transparent 1px); background-size: 16px 16px; }
+.game-shell { overflow-x: hidden; overflow-y: auto; background: #d8c9a9; background-image: linear-gradient(rgba(91, 74, 55, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(91, 74, 55, .06) 1px, transparent 1px); background-size: 16px 16px; }
 .game-shell::before { opacity: .55; background: linear-gradient(135deg, #f4ecd9 0 18%, transparent 18% 72%, #c4b28f 72%); }
 .game-shell header, .game-shell .workflow-strip, .game-shell .side-column > *, .game-shell .metric { border-color: #66584a; background: #fffaf0ee; box-shadow: 4px 4px 0 rgba(91, 74, 55, .25); }
 .game-shell header h1, .game-shell h2, .game-shell strong { color: #493d33; }
@@ -146,3 +146,10 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 .game-shell .side-column .task small { color: #6d5b49; }
 .game-shell .side-column form button { background: #79a77c; border-color: #557b5b; box-shadow: 2px 2px 0 #557b5b; }
 .game-shell .overlay-active-note { border-color: #6f9d78; background: #e3f0d9; color: #477552; }
+.game-shell .agent-roster { margin: 0 20px 20px; padding: 12px; border: 2px solid #66584a; background: #fffaf0ee; box-shadow: 4px 4px 0 rgba(91, 74, 55, .25); }
+.game-shell .agent-roster .panel-title { margin-bottom: 8px; }
+.game-shell .agent-roster .agents { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.game-shell .agent-roster .agent { flex: 0 0 178px; min-height: 58px; padding: 8px; border: 1px solid #b9a886; border-radius: 4px; background: #f4ecd9; color: #493d33; }
+.game-shell .agent-roster .agent strong { color: #493d33; font-size: .72rem; }
+.game-shell .agent-roster .agent-status { color: #6d5b49; font-size: .62rem; }
+.game-shell .agent-roster .avatar { width: 32px; height: 32px; border-radius: 3px; border: 2px solid #66584a; }

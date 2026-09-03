@@ -100,3 +100,23 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 .game-shell .conversation form { display: none; }
 @media (max-width: 900px) { .game-shell .dashboard-grid { padding-right: 20px; } .game-shell .office-map-panel { height: calc(100vh - 230px); } .game-shell .side-column { position: static; width: auto; max-height: none; margin-top: 10px; } .game-shell .metrics { right: 20px; top: 102px; } .game-shell .command-bar { right: 20px; } .game-shell .conversation { position: static; width: auto; max-height: none; margin-top: 10px; } }
 @media (max-width: 720px) { .game-shell header { align-items: flex-start; } .game-shell header .header-actions { flex-wrap: wrap; justify-content: flex-end; } .game-shell .status-pill { display: none; } }
+
+/* One-page workspace: office on the left, CEO chat on the right. */
+.game-shell .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 14px; padding: 138px 20px 20px; min-height: 100vh; }
+.game-shell .office-map-panel { grid-column: 1; height: calc(100vh - 158px); }
+.game-shell .side-column { position: static; grid-column: 2; display: flex; flex-direction: column; width: auto; max-height: calc(100vh - 158px); overflow: auto; gap: 10px; }
+.game-shell .side-column > * { flex: 0 0 auto; }
+.game-shell .side-column .conversation { position: static; width: auto; max-height: none; padding: 14px; }
+.game-shell .side-column .conversation .messages { max-height: 360px; margin-bottom: 12px; }
+.game-shell .side-column .conversation form { display: flex; }
+.game-shell .side-column .conversation form input { min-width: 0; width: 100%; padding: 10px; }
+.game-shell .side-column .conversation form button { padding: 10px 12px; }
+.game-shell .side-column .live-activity, .game-shell .side-column .task-board { padding: 12px; }
+.game-shell .metrics { right: 395px; }
+.game-shell .command-bar { display: none; }
+@media (max-width: 900px) {
+  .game-shell .dashboard-grid { display: block; padding: 138px 20px 20px; }
+  .game-shell .office-map-panel { height: calc(100vh - 420px); min-height: 420px; }
+  .game-shell .side-column { max-height: none; margin-top: 10px; }
+  .game-shell .metrics { right: 20px; }
+}

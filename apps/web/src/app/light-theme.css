@@ -155,3 +155,16 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 .game-shell .agent-roster .agent strong { color: #493d33; font-size: .72rem; }
 .game-shell .agent-roster .agent-status { color: #6d5b49; font-size: .62rem; }
 .game-shell .agent-roster .avatar { width: 32px; height: 32px; border-radius: 3px; border: 2px solid #66584a; }
+
+/* Keep the fixed header, workflow strip, workspace and completion notices in separate layers. */
+.game-shell .workflow-strip { top: 112px; }
+.game-shell .dashboard-grid { padding-top: 174px; }
+.game-shell .notification-center { left: 24px; right: auto; bottom: 24px; width: min(340px, calc(100vw - 48px)); z-index: 30; }
+.game-shell .notification-center .toast { color: #493d33; border-color: #8f7b5d; background: #fffaf0; box-shadow: 4px 4px 0 rgba(91, 74, 55, .28); }
+.game-shell .notification-center .toast strong { color: #493d33; }
+.game-shell .notification-center .toast p { color: #6d5b49; }
+.game-shell .notification-center .toast button { color: #6d5b49; }
+@media (max-width: 900px) {
+  .game-shell .workflow-strip { top: 112px; }
+  .game-shell .dashboard-grid { padding-top: 174px; }
+}

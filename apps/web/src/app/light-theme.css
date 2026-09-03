@@ -141,5 +141,8 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 .game-shell .message { background: #f0e7d3; border: 1px solid #ddceb0; }
 .game-shell .message.CEO { background: #dcebd5; }
 .game-shell .side-column input { border-color: #a99576; background: #fffaf0; color: #493d33; }
+.game-shell .side-column .task { color: #493d33; border-color: #b9a886; background: #fffaf0; }
+.game-shell .side-column .task:hover { background: #f2e5c7; }
+.game-shell .side-column .task small { color: #6d5b49; }
 .game-shell .side-column form button { background: #79a77c; border-color: #557b5b; box-shadow: 2px 2px 0 #557b5b; }
 .game-shell .overlay-active-note { border-color: #6f9d78; background: #e3f0d9; color: #477552; }

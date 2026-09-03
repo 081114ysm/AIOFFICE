@@ -54,3 +54,40 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 @keyframes pixel-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 @media (max-width: 900px) { .command-bar, .dashboard-grid { grid-template-columns: 1fr; } .roster-panel { grid-column: auto; } }
 @media (max-width: 600px) { .shell { padding: 20px 14px 44px; } header { align-items: flex-start; gap: 18px; flex-direction: column; } .header-actions { flex-wrap: wrap; } .pixel-office-map { min-height: 560px; } .office-room { width: 44%; height: 27%; } .room-ceo { width: 48%; } .room-research { right: 2%; } .room-qa { left: 28%; width: 44%; top: 37%; } .room-content, .room-dev { bottom: 5%; } }
+
+/* Full-screen pixel-world layout inspired by AI town interfaces. */
+.game-shell { position: relative; min-height: 100vh; max-width: none; padding: 0; overflow: hidden; background: #b9dbf2; }
+.game-shell::before { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .35; background: linear-gradient(135deg, #e9f7ff 0 18%, transparent 18% 72%, #a7d0ea 72%); }
+.game-shell header { position: fixed; z-index: 20; top: 16px; left: 20px; right: 20px; margin: 0; padding: 10px 14px; border: 2px solid #5d88ae; border-radius: 12px; background: #f8fcffed; box-shadow: 4px 4px 0 #6794b766; }
+.game-shell header h1 { margin: 2px 0; font-size: 1.25rem; letter-spacing: -.05em; }
+.game-shell header .muted { display: none; }
+.game-shell .brand-mark { width: 34px; height: 34px; border-width: 2px; border-radius: 8px; box-shadow: 2px 2px 0 #9fc4e6; font-size: 1rem; }
+.game-shell .workflow-strip { position: fixed; z-index: 18; top: 78px; left: 20px; right: 20px; margin: 0; padding: 8px 14px; border: 2px solid #6f9abe; border-radius: 9px; box-shadow: 3px 3px 0 #6794b755; }
+.game-shell .workflow-heading { margin: 0; }
+.game-shell .workflow-heading .muted { font-size: .62rem; }
+.game-shell .workflow-steps { gap: 12px; }
+.game-shell .workflow-step { font-size: .68rem; }
+.game-shell .workflow-index { width: 20px; height: 20px; border-radius: 5px; }
+.game-shell .dashboard-grid { position: relative; display: block; min-height: 100vh; padding: 138px 350px 120px 20px; }
+.game-shell .office-map-panel { height: calc(100vh - 158px); min-height: 520px; margin: 0; padding: 10px; border: 2px solid #5d88ae; border-radius: 12px; background: #dcecfb; box-shadow: 5px 5px 0 #6794b755; }
+.game-shell .office-map-panel .panel-title { height: 34px; margin: 0; padding: 0 8px 6px; border: 0; }
+.game-shell .office-map-panel .panel-title h2 { font-size: .85rem; }
+.game-shell .office-map-panel .section-kicker { display: inline; margin-right: 8px; font-size: .58rem; }
+.game-shell .pixi-office-canvas { height: calc(100% - 34px); min-height: 0; border: 2px solid #83a9c9; border-radius: 7px; }
+.game-shell .pixi-office-canvas canvas { height: 100%; min-height: 0; }
+.game-shell .side-column { position: fixed; z-index: 12; top: 138px; right: 20px; width: 310px; max-height: calc(100vh - 158px); overflow: auto; gap: 10px; padding-right: 2px; }
+.game-shell .side-column > * { border: 2px solid #6c95b8; border-radius: 10px; background: #f8fcfff2; box-shadow: 3px 3px 0 #6794b755; }
+.game-shell .panel-title { padding-bottom: 9px; margin-bottom: 9px; }
+.game-shell .metrics { position: fixed; z-index: 14; top: 102px; right: 340px; width: 280px; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 0; }
+.game-shell .metric { min-width: 0; padding: 7px 8px; border: 1px solid #83a9c9; border-radius: 7px; background: #f8fcffe8; box-shadow: 2px 2px 0 #6794b733; }
+.game-shell .metric strong { font-size: .95rem; }
+.game-shell .metric span { font-size: .58rem; }
+.game-shell .command-bar { position: fixed; z-index: 21; left: 20px; right: 350px; bottom: 18px; margin: 0; padding: 10px 12px; grid-template-columns: 190px 1fr; gap: 10px; border: 2px solid #5d88ae; border-radius: 10px; box-shadow: 4px 4px 0 #6794b766; }
+.game-shell .command-bar strong { font-size: .85rem; }
+.game-shell .command-bar .muted { font-size: .62rem; }
+.game-shell .command-bar input, .game-shell .command-bar button { height: 36px; padding-top: 7px; padding-bottom: 7px; }
+.game-shell .v2-panel { position: fixed; z-index: 16; left: 20px; bottom: 82px; width: 330px; max-height: 45vh; overflow: auto; margin: 0; border: 2px solid #6c95b8; border-radius: 10px; box-shadow: 3px 3px 0 #6794b755; }
+.game-shell .roster-panel, .game-shell .settings-panel { display: none; }
+.game-shell .conversation { position: fixed; z-index: 18; right: 340px; bottom: 18px; width: 300px; max-height: 260px; overflow: auto; padding: 12px; border: 2px solid #6c95b8; border-radius: 10px; background: #f8fcfff2; box-shadow: 3px 3px 0 #6794b755; }
+.game-shell .conversation form { display: none; }
+@media (max-width: 900px) { .game-shell .dashboard-grid { padding-right: 20px; } .game-shell .office-map-panel { height: calc(100vh - 230px); } .game-shell .side-column { position: static; width: auto; max-height: none; margin-top: 10px; } .game-shell .metrics { right: 20px; top: 102px; } .game-shell .command-bar { right: 20px; } .game-shell .conversation { position: static; width: auto; max-height: none; margin-top: 10px; } }

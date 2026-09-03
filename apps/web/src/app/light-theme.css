@@ -112,7 +112,7 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 .game-shell .side-column .conversation form input { min-width: 0; width: 100%; padding: 10px; }
 .game-shell .side-column .conversation form button { padding: 10px 12px; }
 .game-shell .side-column .live-activity, .game-shell .side-column .task-board { padding: 12px; }
-.game-shell .metrics { right: 395px; }
+.game-shell .metrics { display: none; }
 .game-shell .command-bar { display: none; }
 @media (max-width: 900px) {
   .game-shell .dashboard-grid { display: block; padding: 138px 20px 20px; }

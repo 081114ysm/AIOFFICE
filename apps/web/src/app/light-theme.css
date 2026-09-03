@@ -60,6 +60,11 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 .game-shell::before { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .35; background: linear-gradient(135deg, #e9f7ff 0 18%, transparent 18% 72%, #a7d0ea 72%); }
 .game-shell header { position: fixed; z-index: 20; top: 16px; left: 20px; right: 20px; margin: 0; padding: 10px 14px; border: 2px solid #5d88ae; border-radius: 12px; background: #f8fcffed; box-shadow: 4px 4px 0 #6794b766; }
 .game-shell header h1 { margin: 2px 0; font-size: 1.25rem; letter-spacing: -.05em; }
+.game-shell header .brand-lockup { min-width: 0; }
+.game-shell header .brand-lockup > div:last-child { min-width: 0; }
+.game-shell header .brand-lockup h1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.game-shell header .header-actions { flex-shrink: 0; gap: 6px; }
+.game-shell header .header-actions button { padding: 8px 10px; font-size: .72rem; }
 .game-shell header .muted { display: none; }
 .game-shell .brand-mark { width: 34px; height: 34px; border-width: 2px; border-radius: 8px; box-shadow: 2px 2px 0 #9fc4e6; font-size: 1rem; }
 .game-shell .workflow-strip { position: fixed; z-index: 18; top: 78px; left: 20px; right: 20px; margin: 0; padding: 8px 14px; border: 2px solid #6f9abe; border-radius: 9px; box-shadow: 3px 3px 0 #6794b755; }
@@ -88,6 +93,10 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 .game-shell .command-bar input, .game-shell .command-bar button { height: 36px; padding-top: 7px; padding-bottom: 7px; }
 .game-shell .v2-panel { position: fixed; z-index: 16; left: 20px; bottom: 82px; width: 330px; max-height: 45vh; overflow: auto; margin: 0; border: 2px solid #6c95b8; border-radius: 10px; box-shadow: 3px 3px 0 #6794b755; }
 .game-shell .roster-panel, .game-shell .settings-panel { display: none; }
+.game-shell .overlay-toggle { color: #25679b; }
+.game-shell .overlay-toggle[aria-pressed="true"] { background: #d8f5ea; border-color: #57a987; color: #197454; }
+.game-shell .overlay-active-note { position: fixed; z-index: 19; left: 24px; bottom: 84px; padding: 6px 10px; border: 1px solid #72b99e; border-radius: 7px; background: #e4f8f0; color: #227b5d; font-size: .65rem; font-weight: 800; box-shadow: 2px 2px 0 #6794b744; }
 .game-shell .conversation { position: fixed; z-index: 18; right: 340px; bottom: 18px; width: 300px; max-height: 260px; overflow: auto; padding: 12px; border: 2px solid #6c95b8; border-radius: 10px; background: #f8fcfff2; box-shadow: 3px 3px 0 #6794b755; }
 .game-shell .conversation form { display: none; }
 @media (max-width: 900px) { .game-shell .dashboard-grid { padding-right: 20px; } .game-shell .office-map-panel { height: calc(100vh - 230px); } .game-shell .side-column { position: static; width: auto; max-height: none; margin-top: 10px; } .game-shell .metrics { right: 20px; top: 102px; } .game-shell .command-bar { right: 20px; } .game-shell .conversation { position: static; width: auto; max-height: none; margin-top: 10px; } }
+@media (max-width: 720px) { .game-shell header { align-items: flex-start; } .game-shell header .header-actions { flex-wrap: wrap; justify-content: flex-end; } .game-shell .status-pill { display: none; } }

@@ -16,12 +16,11 @@ V1의 AI 업무 흐름을 실제 프로젝트 작업으로 확장한다. 외부 
 
 ## 안전 원칙
 
-실제 파일 삭제, 셸 명령 실행, GitHub push는 기본 거부한다. 현재 Mock Adapter는 승인 흐름과 결과 형태만 검증한다. 실 Adapter를 연결할 때는 allowlist, workspace 경로 제한, timeout, 로그, 사용자 Approval을 필수로 구현한다.
+파일 삭제, 임의 셸, `git push/reset/clean`, 권한 상승 명령은 거부한다. 실제 Adapter는 allowlist, workspace 경로 제한, 보호 파일 차단, timeout, 실행 로그, 사용자 Approval을 모두 통과해야 한다. GitHub Commit/PR은 서버 토큰을 브라우저에 노출하지 않고 승인된 입력만 API로 전달한다.
 
 ## V2 상태 흐름
 
 ```text
 Agent → Tool Run 요청 → 권한 검사 → CEO Approval
-     → Mock/Real Adapter 실행 → 결과 저장 → Conversation/Event 반영
+     → Real Adapter 실행 → 결과 저장 → Conversation/Event 반영
 ```
-

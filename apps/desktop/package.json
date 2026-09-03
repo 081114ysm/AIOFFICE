@@ -1,7 +1,41 @@
 {
   "name": "@ai-office/desktop",
+  "version": "0.1.0",
+  "description": "AI Office desktop agent overlay",
+  "author": "AI Office",
   "private": true,
-  "scripts": { "dev": "electron ." },
-  "devDependencies": { "electron": "latest" }
+  "main": "main.cjs",
+  "scripts": {
+    "dev": "electron .",
+    "package": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.aioffice.desktop",
+    "productName": "AI Office",
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "agent-runner.cjs",
+      "README.md"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "dmg": {
+      "title": "AI Office"
+    }
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "node-pty": "^1.1.0",
+    "pixi.js": "^8.20.1",
+    "xterm": "^5.3.0"
+  }
 }
-

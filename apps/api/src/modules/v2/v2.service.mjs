@@ -1,8 +1,1 @@
-import { createId, now } from "../../common/id.mjs";
-import { publish } from "../../infrastructure/events/event-bus.mjs";
-import { v2Store } from "./v2.store.mjs";
-export function listV2() { return v2Store; }
-export function hireAgent(input) { const membership = { id: createId(), organizationId: v2Store.organization.id, agentId: input.agentId, role: input.role || "DEVELOPER", hiredAt: now() }; v2Store.memberships.push(membership); return membership; }
-export function requestToolRun(input) { const tool = v2Store.tools.find((item) => item.id === input.toolId); if (!tool) throw Object.assign(new Error("Tool not found"), { statusCode: 404 }); const run = { id: createId(), toolId: tool.id, projectId: input.projectId || "project-demo", requestedBy: input.agentId || "agent-dev", input: input.input || {}, status: "PENDING_APPROVAL", createdAt: now() }; v2Store.toolRuns.unshift(run); v2Store.approvals.unshift({ id: createId(), targetType: "TOOL_RUN", targetId: run.id, status: "PENDING", createdAt: now() }); return run; }
-export function approveToolRun(runId) { const run = v2Store.toolRuns.find((item) => item.id === runId); if (!run) throw Object.assign(new Error("Tool run not found"), { statusCode: 404 }); const approval = v2Store.approvals.find((item) => item.targetId === runId); if (!approval) throw new Error("Approval not found"); approval.status = "APPROVED"; run.status = "RUNNING"; publish("TOOL_RUN_APPROVED", run.projectId, { runId }); setTimeout(() => { run.status = "COMPLETED"; run.output = { mode: "mock", message: "Mock Adapter 실행 완료. 실제 외부 시스템은 아직 연결되지 않았습니다." }; run.completedAt = now(); publish("TOOL_RUN_COMPLETED", run.projectId, { runId }); }, 500); return run; }
-
+export { hireAgent, listV2, requestToolRun, approveToolRun } from "./v2.service.real.mjs";

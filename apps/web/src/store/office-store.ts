@@ -1,20 +1,34 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { officeApi } from "../lib/api-client";
+import { connectOfficeEvents, officeApi } from "../lib/api-client";
 import { notificationService } from "../lib/notification-service";
 import type { OfficeState, V2State } from "../types/office";
 
 export type InAppNotification = { id: string; title: string; message: string; createdAt: string };
-type OfficeStore = { data: OfficeState | null; v2: V2State | null; isLoading: boolean; error: string | null; messageDraft: string; notifications: InAppNotification[]; notificationsReady: boolean; overlayEnabled: boolean; setMessageDraft: (value: string) => void; setOverlayEnabled: (enabled: boolean) => void; fetchState: () => Promise<void>; fetchV2: () => Promise<void>; requestToolRun: (toolId: string) => Promise<void>; approveToolRun: (runId: string) => Promise<void>; sendMessage: () => Promise<void>; runTask: (taskId: string) => Promise<void>; createMeeting: () => Promise<void>; enableNotifications: () => Promise<NotificationPermission | "denied">; dismissNotification: (id: string) => void };
+type OfficeStore = { data: OfficeState | null; v2: V2State | null; isLoading: boolean; error: string | null; messageDraft: string; notifications: InAppNotification[]; notificationsReady: boolean; overlayEnabled: boolean; workspaceRoot: string | null; setMessageDraft: (value: string) => void; setOverlayEnabled: (enabled: boolean) => void; selectWorkspace: () => Promise<void>; fetchState: () => Promise<void>; fetchV2: () => Promise<void>; connectLive: () => () => void; requestToolRun: (toolId: string, input?: Record<string, unknown>) => Promise<void>; approveToolRun: (runId: string) => Promise<void>; sendMessage: () => Promise<void>; runTask: (taskId: string) => Promise<void>; createMeeting: () => Promise<void>; enableNotifications: () => Promise<NotificationPermission | "denied">; dismissNotification: (id: string) => void };
 
-function completedTaskNotification(data: OfficeState, taskId?: string) { return data.tasks.find((task) => task.id === taskId)?.title ?? "AI 작업"; }
+const completionTypes = new Set(["AGENT_RUN_COMPLETED", "AGENT_SPEECH", "TOOL_RUN_COMPLETED", "MEETING_COMPLETED"]);
+function completionNotification(data: OfficeState, event: OfficeState["events"][number]) {
+  if (event.type === "AGENT_SPEECH") return { title: "Codex 응답 완료", message: "대표 지시에 대한 Codex 응답이 도착했습니다." };
+  if (event.type === "TOOL_RUN_COMPLETED") return { title: "AI Office 도구 실행 완료", message: "승인된 도구 작업이 완료되었습니다." };
+  if (event.type === "MEETING_COMPLETED") return { title: "AI Office 회의 완료", message: "회의가 끝나고 참석자들이 자리로 돌아왔습니다." };
+  const taskTitle = data.tasks.find((task) => task.id === event.payload.taskId)?.title ?? "AI 작업";
+  return { title: "AI Office 작업 완료", message: `\"${taskTitle}\" 작업이 검토 대기 상태가 되었습니다.` };
+}
 
 export const useOfficeStore = create<OfficeStore>()(persist((set, get) => ({
-  data: null, v2: null, isLoading: false, error: null, messageDraft: "", notifications: [], notificationsReady: false, overlayEnabled: false,
+  data: null, v2: null, isLoading: false, error: null, messageDraft: "", notifications: [], notificationsReady: false, overlayEnabled: false, workspaceRoot: null,
   setMessageDraft: (value) => set({ messageDraft: value }),
   setOverlayEnabled: (enabled) => { set({ overlayEnabled: enabled }); void officeApi.updateOverlayPreference(enabled); },
+  selectWorkspace: async () => {
+    const root = await window.aiOfficeDesktop?.selectWorkspace?.();
+    if (!root) return;
+    const selected = await officeApi.selectWorkspace(root);
+    set({ workspaceRoot: selected.root });
+  },
   fetchV2: async () => { try { set({ v2: await officeApi.getV2() }); } catch (error) { set({ error: error instanceof Error ? error.message : "V2 상태를 불러오지 못했습니다." }); } },
-  requestToolRun: async (toolId) => { const projectId = get().data?.projects[0]?.id; if (!projectId) return; await officeApi.requestToolRun(toolId, projectId); await get().fetchV2(); },
+  connectLive: () => connectOfficeEvents((event) => { if (event.type !== "CONNECTED") void get().fetchState(); else set({ error: null }); }),
+  requestToolRun: async (toolId, input = {}) => { const projectId = get().data?.projects[0]?.id; if (!projectId) return; await officeApi.requestToolRun(toolId, projectId, input); await get().fetchV2(); },
   approveToolRun: async (runId) => { await officeApi.approveToolRun(runId); await get().fetchV2(); },
   fetchState: async () => {
     set({ isLoading: true, error: null });
@@ -22,9 +36,9 @@ export const useOfficeStore = create<OfficeStore>()(persist((set, get) => ({
       const next = await officeApi.getState(); const previous = get().data;
       if (previous) {
         const oldEvents = new Set(previous.events.map((event) => event.id));
-        next.events.filter((event) => !oldEvents.has(event.id) && event.type === "AGENT_RUN_COMPLETED").forEach((event) => {
-          const title = completedTaskNotification(next, event.payload.taskId); const notice = { id: event.id, title: "AI Office 작업 완료", message: `\"${title}\" 작업이 검토 대기 상태가 되었습니다.`, createdAt: event.occurredAt };
-          set((state) => ({ notifications: [notice, ...state.notifications].slice(0, 5) })); notificationService.taskCompleted(title);
+        next.events.filter((event) => !oldEvents.has(event.id) && completionTypes.has(event.type)).forEach((event) => {
+          const completion = completionNotification(next, event); const notice = { id: event.id, ...completion, createdAt: event.occurredAt };
+          set((state) => ({ notifications: [notice, ...state.notifications].slice(0, 5) })); notificationService.completed(completion.title, completion.message);
         });
       }
       set({ data: next, isLoading: false, notificationsReady: true });

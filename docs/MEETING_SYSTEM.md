@@ -2,35 +2,32 @@
 
 ## 목적
 
-Task가 막혔거나 여러 Agent의 결정이 필요할 때 구조화된 회의를 만든다. 회의는 장식용 채팅방이 아니라 Decision과 Action Item을 생성하는 도메인 이벤트다.
+Meeting은 채팅방이 아니라 여러 Agent의 의견을 모아 Decision과 실제 Action Item을 만드는 도메인 흐름이다.
 
 ## 생성 조건
 
-- Agent가 의존성 충돌이나 요구사항 불명확을 보고한 경우
-- PM이 여러 역할의 검토가 필요하다고 판단한 경우
-- QA가 결함 원인에 대한 재논의를 요청한 경우
+의존성 충돌, 요구사항 불명확, 여러 역할 검토, QA 결함 원인 재논의가 발생하면 PM이 회의를 요청한다. CEO도 직접 시작할 수 있다.
 
 ## 생명주기
 
 `SCHEDULED → IN_PROGRESS → COMPLETED` 또는 `CANCELLED`
 
-## 회의 데이터
+## 저장 필드
 
-회의에는 `projectId`, 목적, agenda, facilitator, participant agents, 관련 taskIds, transcript, summary, decisions, action items, 시작·종료 시각을 저장한다. Transcript와 최종 요약을 섞지 않는다.
+Meeting은 `project_id`, `purpose`, `agenda`, `facilitator`, `participants`, `related_task_ids`, `transcript`, `summary`, `started_at`, `completed_at`을 저장한다. Transcript와 summary를 섞지 않는다.
 
-## 진행 흐름
+Decision은 `question`, `options`, `chosen_option`, `rationale`, `decided_by`, `confidence`를 가진다. Action Item은 `title`, `assignee_agent_id`, `due_at`, `related_task_id`, `status`를 가진다.
+
+## 알고리즘
 
 ```text
-Meeting create → participants load context → round-robin 의견
-→ facilitator summary → Decision/Action Item 추출
-→ 관련 Task 갱신 → Meeting complete Event
+create → Context load → round-robin 의견
+→ facilitator summary → Decision 추출
+→ Action Item/Task 생성 → 관련 Task 갱신 → complete Event
 ```
 
-## 결정과 후속 작업
+참석 Agent 응답이 실패하면 transcript에 오류를 남기고 회의 성공으로 위장하지 않는다. 반복 실패 시 관련 Task를 `BLOCKED`로 바꾸고 재회의를 만든다.
 
-Decision은 `question`, `options`, `chosen_option`, `rationale`, `decided_by`, `confidence`를 가진다. 실행 가능한 내용은 반드시 Action Item으로 분리해 담당 Agent·기한·관련 Task를 지정한다. 회의 요약만 저장하고 실제 Task를 만들지 않는 설계는 추적이 끊긴다.
+## API와 권한
 
-## 실패 처리
-
-참석 Agent 응답 실패는 transcript에 오류 상태로 남기고, 회의 전체를 성공으로 위장하지 않는다. 반복 실패 시 PM이 `BLOCKED` Task와 재회의 필요성을 기록한다.
-
+`POST /api/meetings`는 CEO·PM만 호출한다. 완료·취소는 서버 명령으로만 수행하며 상태 전이는 Event와 History에 기록한다.

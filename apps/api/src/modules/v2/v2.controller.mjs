@@ -1,4 +1,3 @@
 import { readBody } from "../../http/body.mjs";
 import { hireAgent, listV2, requestToolRun, approveToolRun } from "./v2.service.mjs";
 export async function v2Controller(req, res, url) { if (req.method === "GET" && url.pathname === "/api/v2") return listV2(); if (req.method === "POST" && url.pathname === "/api/v2/agents/hire") return hireAgent(await readBody(req)); if (req.method === "POST" && url.pathname === "/api/v2/tool-runs") return requestToolRun(await readBody(req)); const approval = url.pathname.match(/^\/api\/v2\/tool-runs\/([^/]+)\/approve$/); if (req.method === "POST" && approval) return approveToolRun(approval[1]); return false; }
-

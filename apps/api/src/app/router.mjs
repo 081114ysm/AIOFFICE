@@ -12,11 +12,13 @@ import { aiController } from "../modules/ai/ai.controller.mjs";
 import { authController } from "../modules/auth/auth.controller.mjs";
 import { qaController } from "../modules/qa/qa.controller.mjs";
 import { requireRole } from "../modules/auth/authorization.mjs";
+import { agentCollaborationController } from "../modules/agents/agent-collaboration.controller.mjs";
 
 export async function route(req, res, url) {
   if (url.pathname.startsWith("/api/v2")) { await requireRole(req, ["CEO", "PM", "DEVELOPER"]); return v2Controller(req, res, url); }
   if (url.pathname.startsWith("/api/github")) { await requireRole(req, ["CEO", "PM", "DEVELOPER", "QA"]); return githubController(req, res, url); }
   if (url.pathname.startsWith("/api/ai")) { await requireRole(req, ["CEO", "PM", "DEVELOPER", "RESEARCH", "QA"]); return aiController(req, res, url); }
+  if (url.pathname.startsWith("/api/agents")) { await requireRole(req, ["CEO", "PM", "DEVELOPER", "RESEARCH", "QA"]); return agentCollaborationController(req, res, url); }
   if (url.pathname.startsWith("/api/auth")) return authController(req, res, url);
   if (req.method === "GET" && url.pathname === "/health") return healthController(req, res);
   if (req.method === "GET" && url.pathname === "/api/state") { await requireRole(req, ["CEO", "PM", "DEVELOPER", "RESEARCH", "QA"]); return getState(); }

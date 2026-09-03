@@ -28,6 +28,8 @@ body { background: #edf4fc; background-image: linear-gradient(rgba(74, 126, 184,
 .side-column { display: grid; align-content: start; gap: 14px; }
 .roster-panel { grid-column: 1 / -1; }
 .pixel-office-map { position: relative; min-height: 430px; overflow: hidden; border: 1px solid #a6c6e6; border-radius: 12px; background: #dcecfb; image-rendering: pixelated; }
+.pixi-office-canvas { position: relative; min-height: 520px; overflow: hidden; border: 1px solid #a6c6e6; border-radius: 12px; background: #dcecfb; image-rendering: pixelated; }
+.pixi-office-canvas canvas { display: block; width: 100%; min-height: 520px; image-rendering: pixelated; }
 .map-grid { position: absolute; inset: 0; opacity: .32; background-image: linear-gradient(#fff 2px, transparent 2px), linear-gradient(90deg, #fff 2px, transparent 2px); background-size: 32px 32px; }
 .map-road { position: absolute; z-index: 1; background: #c5dbef; border: 2px solid #b1cce6; }
 .road-horizontal { left: 0; right: 0; top: 47%; height: 42px; border-left: 0; border-right: 0; }

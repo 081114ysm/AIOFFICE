@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { config } from "../../config/env.mjs";
+import { generateCodexResponse } from "./codex.client.mjs";
 
 let client;
 const calls = [];
@@ -18,6 +19,7 @@ function checkQuota() {
 export async function generateAgentResponse(prompt) {
   if (typeof prompt !== "string" || !prompt.trim()) throw new Error("prompt가 필요합니다.");
   if (prompt.length > 8_000) throw new Error("prompt는 8,000자 이내여야 합니다.");
+  if (config.aiProvider === "codex_cli") return generateCodexResponse(prompt);
   checkQuota();
   const response = await getClient().responses.create({ model: config.openaiModel, instructions: "당신은 AI Office의 업무 에이전트입니다. 사실과 추측을 구분하고, 파일 변경이나 외부 작업이 필요하면 먼저 승인 요청을 반환하세요.", input: prompt, max_output_tokens: 2_000 });
   return { id: response.id, model: config.openaiModel, text: response.output_text };

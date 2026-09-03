@@ -6,6 +6,7 @@ export const config = {
   githubRepository: process.env.GITHUB_REPOSITORY ?? "081114ysm/AIOFFICE",
   databaseUrl: process.env.DATABASE_URL ?? "",
   openaiApiKey: process.env.OPENAI_API_KEY ?? "",
+  aiProvider: process.env.AI_PROVIDER ?? "codex_cli",
   openaiModel: process.env.AI_MODEL || "gpt-5",
   openaiPerMinuteLimit: Number(process.env.AI_PER_MINUTE_LIMIT ?? 20),
   openaiDailyLimit: Number(process.env.AI_DAILY_LIMIT ?? 100),

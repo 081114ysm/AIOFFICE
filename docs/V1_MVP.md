@@ -1,76 +1,60 @@
-# AI Office V1 MVP
+# AI Office V1 MVP 구현 명세
 
-## 목적
+## 문서 목적
 
-사용자가 CEO가 되어 AI Agent에게 업무를 요청하고, 프로젝트·Task·Conversation·Meeting·Decision·QA·Approval·Memory·History를 하나의 흐름으로 관리하는 첫 번째 구현 버전이다.
+`PROJECT_SPEC.md`가 제품 전체 방향이라면 이 문서는 V1 구현 계약이다. Notion 기본편의 12개 부서 운영 흐름과 심화편의 직원 상태·하루 시나리오·대표 지시창을 참고한다. V1에서는 외부 도구를 실행하지 않는다.
 
-`PROJECT_SPEC.md`는 전체 제품 방향과 V2까지의 원문 기준 문서이고, 이 문서는 V1 구현 범위를 고정하는 실행 기준 문서다.
+## 사용자 시나리오
 
-## 핵심 사용자 시나리오
+```text
+CEO 프로젝트 생성 → Conversation 지시 입력 → PM 요청 요약/Task 분해
+→ dependency 순서 실행 → Agent 결과 저장 → QA 검토
+→ Meeting Decision/Action Item → CEO 승인/반려
+→ Summary/Memory/History 저장 → PAUSED 작업 Resume
+```
 
-1. CEO가 프로젝트를 생성한다.
-2. CEO가 Conversation에서 업무를 요청한다.
-3. PM Agent가 요구사항을 요약하고 Task를 분해한다.
-4. PM이 Researcher·Developer·QA에게 Task를 할당한다.
-5. Agent가 순서대로 실행하고 상태를 변경한다.
-6. 협업이 필요하면 Meeting을 열고 결과와 Action Item을 만든다.
-7. QA가 결과를 검증한다.
-8. CEO가 승인하거나 반려한다.
-9. 결과·Decision·요약이 Memory와 History에 저장된다.
-10. PAUSED 프로젝트의 Conversation을 다시 열어 Resume한다.
+## 포함 범위
 
-## V1 포함 범위
+- Project 생성·조회·상태 변경
+- PM, RESEARCH, DEVELOPER, QA Agent와 Project membership
+- Task·dependency·Agent Run·실행 로그
+- Conversation·Message·sequence·summary/context snapshot
+- Meeting·participant·transcript·Decision·Action Item
+- QA Review와 CEO Approval
+- append-only Event와 WebSocket 실시간 갱신
+- 프로젝트·Task·Conversation Memory와 Resume
+- Zustand 화면 캐시와 브라우저/Electron Overlay 설정 동기화
 
-- 프로젝트 1개 이상 생성·조회·상태 변경
-- PM, Research, Developer, QA Agent
-- Task 상태, 담당 Agent, 의존성
-- Agent Run과 실행 로그
-- Conversation과 메시지 저장
-- Meeting, 참석 Agent, transcript, Decision, Action Item
-- QA 결과와 CEO Approval
-- Event 기반 상태 변경 및 실시간 갱신
-- Task/Project/Conversation Memory와 Summary
-- 작업 중단·재개(Resume)
+## 제외 범위
 
-## V1 제외 범위
+GitHub 쓰기, Terminal/File System/MCP 실행, 자동 채용, 조직 권한, 과금, 완전 자율 실행은 V2다. UI 버튼만 만들고 실제 명령을 실행하는 척하면 V1 완료가 아니다.
 
-GitHub 실제 조작, Terminal/File System/MCP Tool 실행, Agent 자동 채용, 다중 조직 권한, 비용 과금, 고급 검색·포크·브랜치, 완전 자율 실행은 V2로 미룬다. UI에서 버튼만 먼저 만들어 놓는 식의 가짜 통합은 V1 완료로 인정하지 않는다.
+## REST 계약
 
-## 완료 조건
+| Method | Path | 권한 | 결과 |
+|---|---|---|---|
+| POST | `/api/projects` | CEO, PM | Project + 기본 Conversation |
+| GET | `/api/state` | 로그인 사용자 | Office snapshot |
+| GET | `/api/conversations/:id` | Project 접근자 | 대화·메시지·Task |
+| POST | `/api/conversations/:id/messages` | CEO, PM, DEVELOPER, RESEARCH | Message + PM 요청 |
+| POST | `/api/conversations/:id/resume` | CEO, PM | Resume Context/Event |
+| POST | `/api/tasks/:id/run` | CEO, PM, DEVELOPER | dependency 검사 + Agent Run |
+| POST | `/api/meetings` | CEO, PM | Meeting 생성 |
+| POST | `/api/approvals/:id/approve` | CEO | 대기 대상 승인 |
+| GET | `/ws` | 허용 Origin | Event stream |
 
-- 새 프로젝트를 만들고 Conversation에서 요청을 입력할 수 있다.
-- PM이 요청을 Task로 분해한 기록이 남는다.
-- Task 의존성이 준비된 순서로 Agent Run을 생성한다.
-- Agent 상태가 `IDLE → WORKING → MEETING/WAITING → DONE` 흐름을 따른다.
-- Meeting 결과가 Decision·Action Item으로 저장된다.
-- QA가 PASS/FAIL과 근거를 남긴다.
-- CEO 승인 전에는 프로젝트를 완료할 수 없다.
-- 새로고침 후에도 Conversation·Task·Meeting·Approval 기록이 복원된다.
-- PAUSED 작업을 Resume하면 이전 Summary와 최근 메시지가 Context로 주입된다.
+모든 명령은 서버가 상태를 변경하고 관련 Event를 기록한다. 클라이언트가 Agent 상태를 직접 바꾸면 안 된다.
 
-## 구현 순서
+## 상태
 
-1. 저장소 골격과 공통 타입
-2. Project·Agent·Task CRUD
-3. Conversation·Message와 PM 요청 흐름
-4. 의존성 기반 Agent Run
-5. Meeting·Decision·Action Item
-6. QA·Approval
-7. Event/WebSocket과 Office UI
-8. Summary·Memory·Resume
-9. 시나리오 테스트와 운영 로그
+- Project: `PLANNING | ACTIVE | PAUSED | WAITING_APPROVAL | DONE`
+- Task: `TODO | READY | IN_PROGRESS | BLOCKED | IN_REVIEW | DONE | FAILED`
+- Agent: `IDLE | WORKING | MEETING | WAITING | OFFLINE`
+- Meeting: `SCHEDULED | IN_PROGRESS | COMPLETED | CANCELLED`
+- Approval: `PENDING | APPROVED | REJECTED`
 
-## V1 상태 규칙
+CEO 승인 전 Project는 `DONE`이 될 수 없다. 새로고침 후에도 Conversation·Task·Meeting·Approval이 DB에서 복원되어야 한다.
 
-프로젝트: `PLANNING | ACTIVE | PAUSED | WAITING_APPROVAL | DONE`
+## 안전 규칙
 
-Task: `TODO | READY | IN_PROGRESS | BLOCKED | IN_REVIEW | DONE | FAILED`
-
-Agent: `IDLE | WORKING | MEETING | WAITING | OFFLINE`
-
-Meeting: `SCHEDULED | IN_PROGRESS | COMPLETED | CANCELLED`
-
-Approval: `PENDING | APPROVED | REJECTED`
-
-상태 변경은 임의의 화면 로컬 상태가 아니라 서버 Event와 History에 기록된 명령의 결과여야 한다.
-
+모든 API는 세션 사용자와 Project 접근 권한을 확인한다. AI 원문과 화면 표시 텍스트를 분리하고 오류를 숨기지 않는다. Event는 append-only다.

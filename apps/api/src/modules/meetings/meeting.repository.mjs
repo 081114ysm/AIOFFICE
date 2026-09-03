@@ -1,3 +1,8 @@
-import { memoryStore } from "../../infrastructure/database/memory.store.mjs";
-export const meetingRepository = { create: (meeting) => { memoryStore.meetings.unshift(meeting); return meeting; } };
-
+import { pool } from "../../infrastructure/database/postgres.mjs";
+export const meetingRepository = {
+  create: async (meeting) => (await pool.query("insert into meetings (id, project_id, title, status, agenda, created_at) values ($1, $2, $3, $4, $5, $6) returning id, project_id, title, status, agenda, created_at", [meeting.id, meeting.projectId, meeting.title, meeting.status, meeting.agenda, meeting.createdAt])).rows[0],
+  complete: async (meetingId, summary) => (await pool.query("update meetings set status = 'COMPLETED', summary = $2, completed_at = now() where id = $1 and status = 'IN_PROGRESS' returning id, project_id, title, status, summary, completed_at", [meetingId, summary])).rows[0],
+  addMessage: async (message) => pool.query("insert into meeting_messages (id, meeting_id, agent_id, role, content, sequence) values ($1, $2, $3, $4, $5, $6)", [message.id, message.meetingId, message.agentId, message.role, message.content, message.sequence]),
+  addDecision: async (decision) => pool.query("insert into decisions (id, project_id, meeting_id, question, options, chosen_option, rationale, confidence) values ($1, $2, $3, $4, $5, $6, $7, $8)", [decision.id, decision.projectId, decision.meetingId, decision.question, JSON.stringify(decision.options ?? []), decision.chosenOption ?? null, decision.rationale ?? "", decision.confidence ?? null]),
+  addActionItem: async (item) => pool.query("insert into action_items (id, project_id, meeting_id, title, assignee_agent_id, task_id, due_at) values ($1, $2, $3, $4, $5, $6, $7)", [item.id, item.projectId, item.meetingId, item.title, item.assigneeAgentId ?? null, item.taskId ?? null, item.dueAt ?? null]),
+};

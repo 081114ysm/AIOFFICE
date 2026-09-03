@@ -8,9 +8,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "pg": "^8.23.0"
+    "openai": "^7.8.0",
+    "pg": "^8.23.0",
+    "ws": "^8.21.3"
   },
   "devDependencies": {
+    "@types/ws": "^8.18.1",
     "typescript": "^7.0.2"
   }
 }

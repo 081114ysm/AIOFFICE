@@ -3,15 +3,31 @@ import { config } from "./config/env.mjs";
 import { cors, json } from "./http/response.mjs";
 import { route } from "./app/router.mjs";
 import { migrate, pool } from "./infrastructure/database/postgres.mjs";
+import { WebSocketServer } from "ws";
+import { subscribeEvents } from "./infrastructure/events/event-bus.mjs";
 
 const server = createServer(async (req, res) => {
   if (req.method === "OPTIONS") return cors(res, config.webOrigin);
   const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
   try {
     const result = await route(req, res, url);
-    if (result !== false) return json(res, 200, result, config.webOrigin);
+    if (result !== false) {
+      if (result?.setCookie) res.setHeader("set-cookie", result.setCookie);
+      if (result?.redirect) { res.writeHead(302, { location: result.redirect }); res.end(); return; }
+      return json(res, 200, result, config.webOrigin);
+    }
     return json(res, 404, { message: "Not found" }, config.webOrigin);
-  } catch (error) { return json(res, 400, { message: error instanceof Error ? error.message : "Bad request" }, config.webOrigin); }
+  } catch (error) { return json(res, error?.statusCode ?? 400, { message: error instanceof Error ? error.message : "Bad request" }, config.webOrigin); }
+});
+const websocketServer = new WebSocketServer({ noServer: true });
+server.on("upgrade", (request, socket, head) => {
+  const origin = request.headers.origin;
+  if (origin && origin !== config.webOrigin) { socket.destroy(); return; }
+  if (request.url !== "/ws") { socket.destroy(); return; }
+  websocketServer.handleUpgrade(request, socket, head, (client) => {
+    subscribeEvents(client);
+    client.send(JSON.stringify({ type: "CONNECTED", occurredAt: new Date().toISOString() }));
+  });
 });
 
 async function start() {

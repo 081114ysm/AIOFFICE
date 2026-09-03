@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "next": "latest",
+    "pixi.js": "^8.20.1",
     "react": "latest",
     "react-dom": "latest",
     "zustand": "latest"

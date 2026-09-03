@@ -1,41 +1,37 @@
 # AI Office Agent System
 
-## Agent 역할
+## 역할 계약
 
-- `PM`: 요청 해석, Task 분해·할당, 진행 조정
-- `RESEARCH`: 자료 조사와 요구사항 근거 정리
-- `DEVELOPER`: 구현 계획과 결과 작성
-- `QA`: 완료 조건 검증과 결함 보고
+| role | 책임 | 산출물 |
+|---|---|---|
+| PM | 요청 해석·Task 분해·할당·조정 | 계획 JSON, Task 목록 |
+| RESEARCH | 조사·근거 정리 | 근거 있는 조사 결과 |
+| DEVELOPER | 구현 계획·결과 작성 | 변경 계획, 결과 요약 |
+| QA | 완료 조건 검증·결함 보고 | PASS/FAIL, evidence |
 
-역할은 프롬프트 문자열이 아니라 `capabilities`, `system_prompt_version`, `status`를 가진 데이터다. V1에서는 Tool 권한 없이 내부 Context와 다른 Agent 결과만 사용한다.
+역할은 프롬프트 문자열이 아니라 DB의 `role`, `capabilities`, `system_prompt_version`, `status`다.
 
 ## Agent Run
 
-Agent 실행은 반드시 다음 정보를 저장한다: `runId`, `agentId`, `taskId`, 입력 Context, 모델, prompt version, 시작·종료 시각, 상태, 출력, 오류, token usage.
-
-```text
-READY Task
-  → Context assemble
-  → Agent adapter call
-  → output validate
-  → result persist
-  → Task/Event update
+```json
+{"runId":"uuid","agentId":"uuid","taskId":"uuid","inputContext":{},"model":"gpt-5","promptVersion":"v1","status":"RUNNING","output":{},"error":null,"startedAt":"ISO-8601","completedAt":null,"tokenUsage":{}}
 ```
 
 ## 실행 규칙
 
-1. 의존 Task가 모두 `DONE`이어야 `READY`가 된다.
-2. 한 Task에 동시에 활성 Run을 둘 이상 만들지 않는다.
-3. AI 출력은 JSON Schema로 검증한다.
-4. 검증 실패는 자동 재시도하되 횟수 제한을 둔다.
-5. 상태 변경과 결과 저장은 한 트랜잭션에서 처리한다.
-6. Agent가 완료를 선언해도 QA와 CEO Approval을 건너뛸 수 없다.
+1. Task가 `READY`인지 확인한다.
+2. 모든 dependency가 `DONE`인지 확인한다.
+3. 활성 Run 중복을 차단한다.
+4. `project summary → task → dependency result → recent messages → memories → meeting decisions` 순서로 Context를 만든다.
+5. Agent adapter를 호출하고 JSON Schema로 출력 검증한다.
+6. 결과·token usage를 저장한다.
+7. 성공은 `IN_REVIEW`, 실패는 `FAILED`로 저장한다.
+8. QA와 CEO Approval 없이는 `DONE`으로 바꾸지 않는다.
 
-## Context 구성
+## 상태 표현
 
-`project summary + current task + dependency results + recent conversation messages + relevant memories + meeting decisions` 순서로 구성한다. 전체 대화를 매번 넣는 것은 비용과 노이즈를 동시에 키우므로 Summary와 최근 메시지 윈도우를 사용한다.
+`IDLE`은 책상 대기, `WORKING`은 작업 중, `MEETING`은 회의, `WAITING`은 승인·의존성 대기, `OFFLINE`은 연결 불가로 Pixel Office에 표시한다. 상태는 DB Event에서 나온다.
 
-## V1 안전 경계
+## 프롬프트 안전
 
-외부 파일 수정·코드 실행·GitHub 변경은 금지한다. V2 Tool System에서 별도 권한과 Approval을 붙인 뒤 허용한다. Agent가 사용자 입력에 포함된 지시로 시스템 규칙을 덮어쓰지 않도록 system prompt와 사용자 Context를 분리한다.
-
+System prompt와 사용자 Context를 분리한다. 사용자 메시지·외부 문서가 system rule을 덮어쓰지 못한다. V1 Agent는 외부 파일·코드·GitHub를 조작하지 않는다. V2 Tool은 capability와 Approval을 통과해야 한다.

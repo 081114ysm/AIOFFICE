@@ -13,11 +13,13 @@ export async function addMessage(conversationId, input) {
   await conversationRepository.addMessage(message, sequence++);
   conversation.updatedAt = now();
   if (message.role === "CEO") {
+    await pool.query("update projects set workflow_stage = 'RESEARCH', status = 'ACTIVE', updated_at = now() where id = $1", [conversation.project_id]);
     const task = { id: createId(), projectId: conversation.project_id, title: message.content.slice(0, 60), status: "READY", assigneeAgentId: "11111111-1111-4111-8111-111111111111" };
     await conversationRepository.addTask(task);
     await conversationRepository.addMessage({ id: createId(), conversationId, role: "PM", content: `요청을 접수했습니다. '${task.title}' 작업을 준비했습니다.`, createdAt: now() }, sequence);
     sequence += 1;
     publish("TASK_CREATED", conversation.project_id, { taskId: task.id });
+    publish("WORKFLOW_STARTED", conversation.project_id, { taskId: task.id, stage: "RESEARCH" });
     await pool.query("update agents set status = 'WORKING', speech = '대표님 지시를 분석하고 있어요' where id = $1", [task.assigneeAgentId]);
     publish("AGENT_SPEECH_STARTED", conversation.project_id, { agentId: task.assigneeAgentId, taskId: task.id });
     try {

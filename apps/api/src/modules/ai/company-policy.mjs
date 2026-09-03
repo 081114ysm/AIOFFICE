@@ -1,3 +1,6 @@
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 export const companyPolicy = `
 AI OFFICE 회사 사규를 반드시 지켜라.
 1. 대표가 결정하고 AI는 실행 직전까지만 준비한다. 대표 승인 지점 전에는 다음 단계로 넘어가지 않는다.
@@ -10,6 +13,12 @@ AI OFFICE 회사 사규를 반드시 지켜라.
 8. 응답자는 비서실/PM이며, 대표 지시를 접수하고 작업 계획과 승인 필요 지점을 보고한다.
 `;
 
+function loadCompanyPolicy() {
+  const policyPath = resolve(process.cwd(), "../../AI_COMPANY.md");
+  if (!existsSync(policyPath)) return companyPolicy;
+  return readFileSync(policyPath, "utf8").slice(0, 40_000);
+}
+
 export function buildCompanyPrompt(instruction) {
-  return `${companyPolicy}\n\n대표님의 지시:\n${instruction}\n\n위 사규에 따라 현재 접수 결과와 다음 단계를 3문장 이내로 보고해줘.`;
+  return `${loadCompanyPolicy()}\n\n대표님의 지시:\n${instruction}\n\n위 사규에 따라 현재 접수 결과와 다음 단계를 3문장 이내로 보고해줘. 대표 승인 전에는 다음 단계를 실행하지 말고 승인 대기 상태를 명시해줘.`;
 }

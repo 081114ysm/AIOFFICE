@@ -13,7 +13,7 @@ export async function reviewTask(taskId, input = {}) {
     if (task.status !== "IN_REVIEW") throw Object.assign(new Error("IN_REVIEW 상태의 Task만 QA할 수 있습니다."), { statusCode: 409 });
     await client.query("insert into qa_reviews (id, project_id, task_id, result, evidence) values ($1, $2, $3, $4, $5)", [createId(), task.project_id, task.id, result, String(input.evidence || "").slice(0, 8_000)]);
     await client.query("update tasks set status = $2, updated_at = now() where id = $1", [task.id, result === "PASS" ? "DONE" : "FAILED"]);
-    if (result === "PASS") await client.query("update projects set status = 'WAITING_APPROVAL', updated_at = now() where id = $1 and status in ('ACTIVE', 'PLANNING')", [task.project_id]);
+    if (result === "PASS") await client.query("update projects set status = 'WAITING_APPROVAL', workflow_stage = 'APPROVAL', updated_at = now() where id = $1 and status in ('ACTIVE', 'PLANNING')", [task.project_id]);
     await client.query("commit");
     publish(result === "PASS" ? "QA_PASSED" : "QA_FAILED", task.project_id, { taskId: task.id, evidence: input.evidence || "" });
     return { taskId: task.id, projectId: task.project_id, result };

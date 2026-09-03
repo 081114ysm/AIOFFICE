@@ -3,7 +3,7 @@ import { pool } from "./postgres.mjs";
 export async function getState() {
   const [preferences, projects, agents, tasks, conversations, messages, meetings, events] = await Promise.all([
     pool.query("select overlay_enabled from preferences where id = true"),
-    pool.query("select id, name, description, status, created_at from projects order by created_at desc"),
+    pool.query("select id, name, description, status, workflow_stage, created_at from projects order by created_at desc"),
     pool.query("select id, name, role, department, status, color, position_x, position_y, room_id, speech, is_manager from agents order by created_at"),
     pool.query("select id, project_id, title, status, assignee_agent_id from tasks order by created_at desc"),
     pool.query("select id, project_id, title, updated_at from conversations order by updated_at desc"),
@@ -13,7 +13,7 @@ export async function getState() {
   ]);
   return {
     preferences: { overlayEnabled: preferences.rows[0]?.overlay_enabled ?? false },
-    projects: projects.rows.map((row) => ({ id: row.id, name: row.name, description: row.description, status: row.status, createdAt: row.created_at })),
+    projects: projects.rows.map((row) => ({ id: row.id, name: row.name, description: row.description, status: row.status, workflowStage: row.workflow_stage, createdAt: row.created_at })),
     agents: agents.rows.map((row) => ({ id: row.id, name: row.name, role: row.role, department: row.department, status: row.status, color: row.color, positionX: row.position_x, positionY: row.position_y, roomId: row.room_id, speech: row.speech, isManager: row.is_manager })),
     tasks: tasks.rows.map((row) => ({ id: row.id, projectId: row.project_id, title: row.title, status: row.status, assigneeAgentId: row.assignee_agent_id })),
     conversations: conversations.rows.map((row) => ({ id: row.id, projectId: row.project_id, title: row.title, updatedAt: row.updated_at })),

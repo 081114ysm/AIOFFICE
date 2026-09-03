@@ -3,9 +3,12 @@ create table if not exists projects (
   name text not null,
   description text not null default '',
   status text not null default 'PLANNING',
+  workflow_stage text not null default 'RESEARCH',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table projects add column if not exists workflow_stage text not null default 'RESEARCH';
 
 create table if not exists agents (
   id uuid primary key,

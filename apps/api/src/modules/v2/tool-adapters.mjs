@@ -44,6 +44,7 @@ function executeCodexInspection(prompt) {
     const finish = (fn, value) => { if (settled) return; settled = true; fn(value); };
     const timer = setTimeout(() => { child.kill("SIGTERM"); finish(reject, Object.assign(new Error("Codex 분석 시간이 초과되었습니다."), { statusCode: 408 })); }, config.toolTimeoutMs);
     child.stdout.on("data", (chunk) => { stdout += chunk.toString(); }); child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+    child.stdin.end();
     child.on("error", (error) => { clearTimeout(timer); finish(reject, error); });
     child.on("close", (code) => { clearTimeout(timer); finish(resolve, { code, stdout: stdout.slice(-30_000), stderr: stderr.slice(-10_000), mode: "read-only" }); });
   });

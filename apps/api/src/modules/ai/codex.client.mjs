@@ -22,6 +22,7 @@ function runCodex(prompt) {
     }, config.toolTimeoutMs);
     child.stdout.on("data", (chunk) => { stdout += chunk.toString(); });
     child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+    child.stdin.end();
     child.on("error", (error) => { clearTimeout(timer); finish(reject, error); });
     child.on("close", (code) => {
       clearTimeout(timer);
